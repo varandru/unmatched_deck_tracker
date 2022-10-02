@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'card_list_tile.dart';
 import 'deck.dart';
@@ -34,30 +32,24 @@ class _DeckListViewState extends State<DeckListView> {
         return;
       } else {
         deck.cards[cardInDeckIndex].count--;
+        deck.deckCount--;
         if (deck.cards[cardInDeckIndex].count <= 0) {
           deck.cards.removeAt(cardInDeckIndex);
         }
       }
       int cardInDiscardIndex =
           discardPile.cards.indexWhere((element) => card.name == element.name);
+      discardPile.deckCount++;
       if (cardInDiscardIndex == -1) {
-        card.count = 1;
-        discardPile.cards.add(card);
-        print("Added ${discardPile.cards.last.count} copies");
+        um.Card newCard = um.Card.fromOther(card);
+        newCard.count = 1;
+        discardPile.cards.add(newCard);
       } else {
-        print("Card is ${discardPile.cards[cardInDiscardIndex].name}");
-        print("Before: ${discardPile.cards[cardInDiscardIndex].count}");
         discardPile.cards[cardInDiscardIndex].count += 1;
-        print(
-            "Got one more ${discardPile.cards[cardInDiscardIndex].name}. Now have ${discardPile.cards[cardInDiscardIndex].count}");
       }
 
       deck.cards.sort(((a, b) => a.name.compareTo(b.name)));
       discardPile.cards.sort(((a, b) => a.name.compareTo(b.name)));
-
-      for (um.Card card in discardPile.cards) {
-        print("${card.name} : ${card.count}");
-      }
     });
   }
 
@@ -69,15 +61,18 @@ class _DeckListViewState extends State<DeckListView> {
         return;
       } else {
         discardPile.cards[cardInDiscardIndex].count--;
+        discardPile.deckCount--;
         if (discardPile.cards[cardInDiscardIndex].count <= 0) {
           discardPile.cards.removeAt(cardInDiscardIndex);
         }
       }
       int cardInDeckIndex =
           deck.cards.indexWhere((element) => card.name == element.name);
+      deck.deckCount++;
       if (cardInDeckIndex == -1) {
-        card.count = 1;
-        deck.cards.add(card);
+        um.Card newCard = um.Card.fromOther(card);
+        newCard.count = 1;
+        deck.cards.add(newCard);
       } else {
         deck.cards[cardInDeckIndex].count++;
       }
@@ -93,7 +88,7 @@ class _DeckListViewState extends State<DeckListView> {
       children: [
         ListTile(
           title: Text(
-              "deck count = ${deck.cards.length}, discard count = ${discardPile.cards.length}"),
+              "deck count = ${deck.deckCount}, discard count = ${discardPile.deckCount}"),
         ),
         ExpansionTile(
           title: const Text("Deck"),

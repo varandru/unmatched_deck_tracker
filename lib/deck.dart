@@ -21,11 +21,14 @@ class Deck {
     Map<String, dynamic> json = jsonDecode(encodedJson);
     cards.clear();
     for (dynamic card in json["cards"]) {
-      cards.add(Card.fromJson(card));
+      Card parsedCard = Card.fromJson(card);
+      cards.add(parsedCard);
+      deckCount += parsedCard.count;
     }
     return true;
   }
 
   ShortDeck summary;
   List<Card> cards = [];
+  int deckCount = 0;
 }

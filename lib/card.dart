@@ -51,6 +51,15 @@ class Card {
       this.value,
       required this.boost});
 
+  Card.fromOther(Card other)
+      : name = other.name,
+        characterName = other.characterName,
+        value = other.value,
+        boost = other.boost,
+        type = other.type,
+        text = other.text,
+        count = other.count;
+
   Card.fromJson(Map<String, dynamic> json)
       : name = json["title"],
         type = typeFromScheme(json["type"]),
