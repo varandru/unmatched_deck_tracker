@@ -1,13 +1,39 @@
 import 'package:flutter/material.dart';
 import 'card.dart' as um;
 
+class InkedCallbackButton extends StatelessWidget {
+  const InkedCallbackButton(
+      {super.key,
+      required this.callback,
+      required this.color,
+      required this.icon,
+      required this.card});
+
+  final IconData icon;
+  final void Function(um.Card) callback;
+  final Color color;
+  final um.Card card;
+
+  @override
+  Widget build(BuildContext context) => Ink(
+        decoration: ShapeDecoration(
+          color: color,
+          shape: const CircleBorder(),
+        ),
+        child: IconButton(
+          icon: Icon(icon),
+          onPressed: () => callback(card),
+        ),
+      );
+}
+
 class CardListTile extends StatefulWidget {
   const CardListTile(this.card,
       {super.key, required this.onPlusTap, required this.onMinusTap});
 
   final um.Card card;
-  final Function(um.Card) onPlusTap;
-  final Function(um.Card) onMinusTap;
+  final void Function(um.Card) onPlusTap;
+  final void Function(um.Card) onMinusTap;
 
   @override
   State<StatefulWidget> createState() => _CardListTileState();
@@ -26,14 +52,18 @@ class _CardListTileState extends State<CardListTile> {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: IconButton(
-        icon: const Icon(Icons.remove),
-        onPressed: () => widget.onMinusTap(widget.card),
+    return ExpansionTile(
+      leading: InkedCallbackButton(
+        callback: widget.onMinusTap,
+        color: Colors.redAccent,
+        icon: Icons.remove,
+        card: widget.card,
       ),
-      trailing: IconButton(
-        icon: const Icon(Icons.add),
-        onPressed: () => widget.onPlusTap(widget.card),
+      trailing: InkedCallbackButton(
+        callback: widget.onPlusTap,
+        color: Colors.greenAccent,
+        icon: Icons.add,
+        card: widget.card,
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -49,6 +79,7 @@ class _CardListTileState extends State<CardListTile> {
         ],
       ),
       subtitle: Text("Boost: ${widget.card.boost}"),
+      children: [Text(widget.card.text)],
     );
   }
 }

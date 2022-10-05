@@ -3,7 +3,7 @@
    <application
         android:label="unmatched_deck_tracker"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/umdt_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"

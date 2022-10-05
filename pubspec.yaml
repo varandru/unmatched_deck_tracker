@@ -61,7 +61,18 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/
+    - assets/characters/Beowulf.json
+    - assets/characters/Bullseye.json
+    - assets/characters/Daredevil.json
+    - assets/characters/Dracula.json
+    - assets/characters/Ghost Rider.json
+    - assets/characters/InGen.json
+    - assets/characters/Little Red.json
+    - assets/characters/Luke Cage.json
+    - assets/characters/Medusa.json
+    - assets/characters/Moon Knight.json
+    - assets/characters/TRex.json
+    - assets/characters/Yennenga.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

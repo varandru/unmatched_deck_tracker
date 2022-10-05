@@ -1,0 +1,116 @@
+{
+  "name": "Daredevil",
+  "hero": {
+    "name": " Daredevil ",
+    "isRanged": false,
+    "hp": 17,
+    "move": 3,
+    "specialAbility": "DURING COMBAT: If you have 2 or fewer cards in your hand, you may BLIND BOOST your attack or defense.(If you have other DURING COMBAT effects, choose the order.)"
+  },
+  "cards": [
+    {
+      "title": "Devil of Hell's Kitchen",
+      "type": "attack",
+      "characterName": "DAREDEVIL",
+      "value": 4,
+      "boost": 3,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": "If you have no cards in your deck, the value of this card is 8 instead.",
+      "afterText": "Shuffle this card and the top four cards of your discard pile into your deck.",
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Man Without Fear",
+      "type": "attack",
+      "characterName": "DAREDEVIL",
+      "value": 2,
+      "boost": 3,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": "You may BLIND BOOST this attack. (This is in addition to any BLIND BOOST from Daredevil's special ability.)",
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Son Of A Boxer",
+      "type": "defence",
+      "characterName": "DAREDEVIL",
+      "value": 3,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "If you lost the combat, deal 2 damage to a fighter adjacent to Daredevil.",
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Feint",
+      "type": "versatile",
+      "characterName": "DAREDEVIL",
+      "value": 2,
+      "boost": 1,
+      "basicText": null,
+      "immediateText": "Cancel all effects on your opponent's card.",
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Take A Knee",
+      "type": "versatile",
+      "characterName": "DAREDEVIL",
+      "value": 3,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "Discard the top card of your deck. Recover health equal to its BOOST value.",
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Grappling Hook",
+      "type": "versatile",
+      "characterName": "DAREDEVIL",
+      "value": 3,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "Move Daredevil up to 2 spaces.",
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Breather",
+      "type": "scheme",
+      "characterName": "DAREDEVIL",
+      "value": null,
+      "boost": 2,
+      "basicText": "Choose an attack, defense, or versatile card from your discard pile and return it to your hand.",
+      "immediateText": null,
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Through Adversity",
+      "type": "scheme",
+      "characterName": "DAREDEVIL",
+      "value": null,
+      "boost": 2,
+      "basicText": "Move Daredevil up to 4 spaces. He may move through opposing fighters. Deal 1 damage to each opposing fighter Daredevil moves through.",
+      "immediateText": null,
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 3
+    }
+  ]
+}

@@ -1,9 +1,24 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/deck_list_tile.dart';
 
 import 'deck.dart';
+
+const MaterialColor primaryBlack = MaterialColor(
+  _blackPrimaryValue,
+  <int, Color>{
+    50: Color(0xFF000000),
+    100: Color(0xFF000000),
+    200: Color(0xFF000000),
+    300: Color(0xFF000000),
+    400: Color(0xFF000000),
+    500: Color(_blackPrimaryValue),
+    600: Color(0xFF000000),
+    700: Color(0xFF000000),
+    800: Color(0xFF000000),
+    900: Color(0xFF000000),
+  },
+);
+const int _blackPrimaryValue = 0xFF101010;
 
 void main() {
   runApp(const MyApp());
@@ -18,33 +33,20 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
+        primarySwatch: primaryBlack,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        primarySwatch: primaryBlack,
+      ),
+      themeMode: ThemeMode.system,
+      home: const MyHomePage(title: 'Unmatched Deck Tracker'),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
 
   final String title;
 
@@ -59,27 +61,22 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: ListView(
-        children: [
-          FutureBuilder(
-              future: DefaultAssetBundle.of(context)
-                  .loadString("assets/The Devil.json"),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return ListTile(
-                    leading: const Icon(Icons.error, color: Colors.red),
-                    title: Text(snapshot.error.toString()),
-                  );
-                }
-                if (snapshot.hasData) {
-                  return DeckListTile(ShortDeck.fromJson(
-                      jsonDecode(snapshot.data!), "assets/The Devil.json"));
-                }
-                return const ListTile(
-                  leading: Icon(Icons.ac_unit_outlined),
-                );
-              })
-        ],
+      body: FutureBuilder(
+        future: getDecksFromAssets(),
+        builder: (context, snapshot) {
+          if (snapshot.hasError) {
+            return Center(
+              child: Text(snapshot.error! as String),
+            );
+          }
+          if (snapshot.hasData) {
+            return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: ((context, index) =>
+                    DeckListTile(snapshot.data![index])));
+          }
+          return const CircularProgressIndicator();
+        },
       ),
     );
   }

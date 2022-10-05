@@ -88,7 +88,7 @@ class _DeckListViewState extends State<DeckListView> {
       children: [
         ListTile(
           title: Text(
-              "deck count = ${deck.deckCount}, discard count = ${discardPile.deckCount}"),
+              "deck count = ${deck.deckCount}/${deck.deckCount + discardPile.deckCount}, discard count = ${discardPile.deckCount}"),
         ),
         ExpansionTile(
           title: const Text("Deck"),
