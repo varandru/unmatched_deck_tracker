@@ -17,7 +17,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
   sdk: '>=2.18.1 <3.0.0'
@@ -61,17 +61,37 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
+    - assets/characters/Achilles.json
+    - assets/characters/Alice.json
+    - assets/characters/Angel.json
     - assets/characters/Beowulf.json
+    - assets/characters/Bigfoot.json
+    - assets/characters/Bloody Mary.json
+    - assets/characters/Bruce Lee.json
+    - assets/characters/Buffy.json
     - assets/characters/Bullseye.json
     - assets/characters/Daredevil.json
+    - assets/characters/Deadpool.json
+    - assets/characters/Dr. Sattler.json
     - assets/characters/Dracula.json
+    - assets/characters/Elektra.json
     - assets/characters/Ghost Rider.json
     - assets/characters/InGen.json
+    - assets/characters/Invisible Man.json
+    - assets/characters/Jekyll & Hyde.json
+    - assets/characters/King Arthur.json
     - assets/characters/Little Red.json
     - assets/characters/Luke Cage.json
     - assets/characters/Medusa.json
     - assets/characters/Moon Knight.json
+    - assets/characters/Raptors.json
+    - assets/characters/Robin Hood.json
+    - assets/characters/Sherlock Holmes.json
+    - assets/characters/Sinbad.json
+    - assets/characters/Spike.json
+    - assets/characters/Sun Wukong.json
     - assets/characters/TRex.json
+    - assets/characters/Willow.json
     - assets/characters/Yennenga.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
