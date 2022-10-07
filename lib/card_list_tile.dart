@@ -143,7 +143,18 @@ class CardListTile extends StatelessWidget {
           Text(card.characterName.toCapitalized()),
         ],
       ),
-      children: [Text(card.text)],
+      children: [
+        Container(
+          margin: const EdgeInsets.symmetric(
+            vertical: 10.0,
+            horizontal: 20.0,
+          ),
+          child: Text(
+            card.text,
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+        ),
+      ],
     );
   }
 }

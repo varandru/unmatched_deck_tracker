@@ -84,33 +84,29 @@ class _DeckListViewState extends State<DeckListView> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      children: [
-        ListTile(
-          title: Text(
-              "deck count = ${deck.deckCount}/${deck.deckCount + discardPile.deckCount}, discard count = ${discardPile.deckCount}"),
-        ),
-        ExpansionTile(
-          title: const Text("Deck"),
-          children: List<CardListTile>.generate(
-              deck.cards.length,
-              (index) => CardListTile(
-                    deck.cards[index],
-                    onMinusTap: moveCardToDiscardPile,
-                  ),
-              growable: false),
-        ),
-        ExpansionTile(
-          title: const Text("Discard Pile"),
-          children: List<CardListTile>.generate(
-              discardPile.cards.length,
-              (index) => CardListTile(
-                    discardPile.cards[index],
-                    onMinusTap: moveCardToDeck,
-                  ),
-              growable: false),
-        ),
-      ],
+    return ListView.builder(
+      itemCount: deck.cards.length + discardPile.cards.length + 2,
+      itemBuilder: (context, index) {
+        if (index == 0) {
+          return ListTile(
+            title: Text(
+                "Deck count = ${deck.deckCount}/${deck.deckCount + discardPile.deckCount}"),
+          );
+        }
+        if (index < deck.cards.length + 1) {
+          return CardListTile(
+            deck.cards[index - 1],
+            onMinusTap: moveCardToDiscardPile,
+          );
+        }
+        if (index == deck.cards.length + 1) {
+          return Text("Discard pile has ${discardPile.deckCount} cards.");
+        }
+        return CardListTile(
+          discardPile.cards[index - deck.cards.length - 2],
+          onMinusTap: moveCardToDeck,
+        );
+      },
     );
   }
 }
