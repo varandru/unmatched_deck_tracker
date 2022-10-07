@@ -20,7 +20,7 @@ class _DeckListViewState extends State<DeckListView> {
   void initState() {
     super.initState();
     deck = widget._deck;
-    discardPile = Deck(ShortDeck("placeholder", ""));
+    discardPile = Deck.empty();
     discardPile.cards.clear();
   }
 
@@ -97,7 +97,6 @@ class _DeckListViewState extends State<DeckListView> {
               (index) => CardListTile(
                     deck.cards[index],
                     onMinusTap: moveCardToDiscardPile,
-                    onPlusTap: moveCardToDeck,
                   ),
               growable: false),
         ),
@@ -108,7 +107,6 @@ class _DeckListViewState extends State<DeckListView> {
               (index) => CardListTile(
                     discardPile.cards[index],
                     onMinusTap: moveCardToDeck,
-                    onPlusTap: moveCardToDiscardPile,
                   ),
               growable: false),
         ),

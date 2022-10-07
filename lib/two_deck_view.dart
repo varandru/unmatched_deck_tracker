@@ -23,11 +23,14 @@ class TwoDecksView extends StatelessWidget {
           length: 2,
           child: Scaffold(
             appBar: AppBar(
-              title: Text(deck.name),
-              bottom: TabBar(tabs: [
-                Tab(text: longDeck.summary.name),
-                Tab(text: secondLongDeck.summary.name)
-              ]),
+              title: const Text("Fight!"),
+              bottom: TabBar(
+                tabs: [
+                  Tab(text: longDeck.summary.name),
+                  Tab(text: secondLongDeck.summary.name)
+                ],
+                indicatorColor: Colors.grey.shade800,
+              ),
             ),
             body: TabBarView(
               children: [

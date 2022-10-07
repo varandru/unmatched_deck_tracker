@@ -20,32 +20,75 @@ class DeckListTile extends StatelessWidget {
   final bool isChosen;
   final bool isTwoPlayerMode;
 
+  String getCardbackPath() => "assets/images/cardbacks/${deck.name}.jpg";
+
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(deck.name),
-      selected: isChosen,
-      onTap: () {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-              maintainState: false,
-              builder: (context) {
-                if (isTwoPlayerMode) {
-                  return previousChoice() != null
-                      ? TwoDecksView(
-                          deckGetter()[previousChoice()!],
-                          secondDeck: deck,
-                        )
-                      : DeckChoiceWidget(
-                          title: "Choose a second deck",
-                          chosenDeck: ChosenDeck(deckGetter(), index),
-                        );
-                } else {
-                  return TwoDecksView(deck);
-                }
-              }),
-        );
-      },
+    Color textColor = isChosen ? Colors.grey : Colors.white;
+
+    TextStyle style = TextStyle(
+        inherit: true,
+        fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
+        color: textColor,
+        shadows: const [
+          Shadow(
+              // bottomLeft
+              offset: Offset(-1.0, -1.0),
+              color: Colors.black),
+          Shadow(
+              // bottomRight
+              offset: Offset(1.0, -1.0),
+              color: Colors.black),
+          Shadow(
+              // topRight
+              offset: Offset(1.0, 1.0),
+              color: Colors.black),
+          Shadow(
+              // topLeft
+              offset: Offset(-1.0, 1.0),
+              color: Colors.black),
+        ]);
+
+    return Container(
+      decoration: BoxDecoration(
+        image: DecorationImage(
+            fit: BoxFit.cover, image: AssetImage(getCardbackPath())),
+      ),
+      child: ListTile(
+        title: Text(deck.name,
+            style: style.copyWith(
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize)),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(deck.heroName, style: style),
+            Text("${deck.hp} HP", style: style),
+            Text("${deck.move} move", style: style)
+          ],
+        ),
+        selected: isChosen,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                maintainState: false,
+                builder: (context) {
+                  if (isTwoPlayerMode) {
+                    return previousChoice() != null
+                        ? TwoDecksView(
+                            deckGetter()[previousChoice()!],
+                            secondDeck: deck,
+                          )
+                        : DeckChoiceWidget(
+                            title: "Choose a second deck",
+                            chosenDeck: ChosenDeck(deckGetter(), index),
+                          );
+                  } else {
+                    return TwoDecksView(deck);
+                  }
+                }),
+          );
+        },
+      ),
     );
   }
 }

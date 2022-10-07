@@ -5,9 +5,18 @@ import 'package:flutter/services.dart';
 import 'card.dart';
 
 class ShortDeck {
-  ShortDeck(this.name, this.filePath);
+  ShortDeck(this.name, this.filePath,
+      {required this.heroName,
+      required this.hp,
+      required this.isRanged,
+      required this.move});
+
   ShortDeck.fromJson(Map<String, dynamic> json, this.filePath)
-      : name = json["name"];
+      : name = json["name"],
+        heroName = json["hero"]["name"],
+        isRanged = json["hero"]["isRanged"],
+        hp = json["hero"]["hp"],
+        move = json["hero"]["move"];
 
   @override
   String toString() {
@@ -15,11 +24,25 @@ class ShortDeck {
   }
 
   String name;
+  String heroName;
+  bool isRanged;
+  int hp;
+  int move;
+
   String filePath;
 }
 
 class Deck {
   Deck(ShortDeck shortDeck) : summary = shortDeck;
+  Deck.empty()
+      : summary = ShortDeck(
+          "",
+          "",
+          heroName: "",
+          hp: 0,
+          isRanged: false,
+          move: 0,
+        );
 
   Future<bool> fillDeckFromFile() async {
     String encodedJson = await rootBundle.loadString(summary.filePath);

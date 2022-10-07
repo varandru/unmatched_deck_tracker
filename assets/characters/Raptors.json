@@ -1,1 +1,155 @@
-{"name":"Raptors ×3","hero":{"name":"Raptors ×3","isRanged":false,"hp":7,"move":3,"specialAbility":"Raptors add 1 to the value of their attack cards for each of your other Raptors adjacent to thedefender."},"cards":[{"title":"Disengage","type":"attack","characterName":"ANY","value":4,"boost":2,"basicText":null,"immediateText":null,"duringText":null,"afterText":"Choose an empty space in this fighter's zone. Place this fighter in that space.","imageUrl":null,"quantity":2},{"title":"Clever Girl","type":"attack","characterName":"ANY","value":3,"boost":3,"basicText":null,"immediateText":null,"duringText":null,"afterText":"If one or more of your Raptors is adjacent to the opposing fighter, gain 1 action.","imageUrl":null,"quantity":3},{"title":"Coordinated Attack Pattern","type":"scheme","characterName":"ANY","value":null,"boost":2,"basicText":"Choose one of your Raptors. You may place each of your other Raptors in any space in the chosen Raptor's zone.","immediateText":null,"duringText":null,"afterText":null,"imageUrl":null,"quantity":2},{"title":"Pack Hunters","type":"attack","characterName":"ANY","value":4,"boost":2,"basicText":null,"immediateText":null,"duringText":null,"afterText":"If you won the combat, deal 1 damage to the opposing fighter for each of your Raptors adjacent to them.","imageUrl":null,"quantity":2},{"title":"Eaten Alive","type":"versatile","characterName":"ANY","value":4,"boost":2,"basicText":null,"immediateText":null,"duringText":null,"afterText":"If you won the combat, deal 1 damage to one adjacent opposing fighter.","imageUrl":null,"quantity":3},{"title":"Working Things Out","type":"scheme","characterName":"ANY","value":null,"boost":2,"basicText":"Move each of your Raptors up to 3 spaces. You may move them through spaces containing opposing fighters. Gain 1 action.","immediateText":null,"duringText":null,"afterText":null,"imageUrl":null,"quantity":2},{"title":"Decoy","type":"defence","characterName":"ANY","value":3,"boost":1,"basicText":null,"immediateText":"Choose one of your other undefeated Raptors. You may place her adjacent to the opposing fighter.","duringText":null,"afterText":null,"imageUrl":null,"quantity":4},{"title":"They Remember","type":"attack","characterName":"ANY","value":2,"boost":2,"basicText":null,"immediateText":null,"duringText":null,"afterText":"Gain 1 action.","imageUrl":null,"quantity":4},{"title":"Eviscerate","type":"attack","characterName":"ANY","value":5,"boost":3,"basicText":null,"immediateText":null,"duringText":null,"afterText":null,"imageUrl":null,"quantity":2},{"title":"Ambush","type":"attack","characterName":"ANY","value":2,"boost":3,"basicText":null,"immediateText":null,"duringText":"Your opponent discards 1 random card. Add its BOOST value to this card's attack value.","afterText":null,"imageUrl":null,"quantity":3},{"title":"Feint","type":"versatile","characterName":"ANY","value":2,"boost":1,"basicText":null,"immediateText":"Cancel all effects on your opponent's card.","duringText":null,"afterText":null,"imageUrl":null,"quantity":3}]}
+{
+  "name": "Raptors",
+  "hero": {
+    "name": "Raptors",
+    "isRanged": false,
+    "hp": 7,
+    "move": 3,
+    "specialAbility": "Raptors add 1 to the value of their attack cards for each of your other Raptors adjacent to thedefender."
+  },
+  "cards": [
+    {
+      "title": "Disengage",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 4,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "Choose an empty space in this fighter's zone. Place this fighter in that space.",
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Clever Girl",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 3,
+      "boost": 3,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "If one or more of your Raptors is adjacent to the opposing fighter, gain 1 action.",
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Coordinated Attack Pattern",
+      "type": "scheme",
+      "characterName": "ANY",
+      "value": null,
+      "boost": 2,
+      "basicText": "Choose one of your Raptors. You may place each of your other Raptors in any space in the chosen Raptor's zone.",
+      "immediateText": null,
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Pack Hunters",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 4,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "If you won the combat, deal 1 damage to the opposing fighter for each of your Raptors adjacent to them.",
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Eaten Alive",
+      "type": "versatile",
+      "characterName": "ANY",
+      "value": 4,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "If you won the combat, deal 1 damage to one adjacent opposing fighter.",
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Working Things Out",
+      "type": "scheme",
+      "characterName": "ANY",
+      "value": null,
+      "boost": 2,
+      "basicText": "Move each of your Raptors up to 3 spaces. You may move them through spaces containing opposing fighters. Gain 1 action.",
+      "immediateText": null,
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Decoy",
+      "type": "defence",
+      "characterName": "ANY",
+      "value": 3,
+      "boost": 1,
+      "basicText": null,
+      "immediateText": "Choose one of your other undefeated Raptors. You may place her adjacent to the opposing fighter.",
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 4
+    },
+    {
+      "title": "They Remember",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 2,
+      "boost": 2,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": "Gain 1 action.",
+      "imageUrl": null,
+      "quantity": 4
+    },
+    {
+      "title": "Eviscerate",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 5,
+      "boost": 3,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 2
+    },
+    {
+      "title": "Ambush",
+      "type": "attack",
+      "characterName": "ANY",
+      "value": 2,
+      "boost": 3,
+      "basicText": null,
+      "immediateText": null,
+      "duringText": "Your opponent discards 1 random card. Add its BOOST value to this card's attack value.",
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 3
+    },
+    {
+      "title": "Feint",
+      "type": "versatile",
+      "characterName": "ANY",
+      "value": 2,
+      "boost": 1,
+      "basicText": null,
+      "immediateText": "Cancel all effects on your opponent's card.",
+      "duringText": null,
+      "afterText": null,
+      "imageUrl": null,
+      "quantity": 3
+    }
+  ]
+}
