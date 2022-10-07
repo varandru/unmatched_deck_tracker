@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:unmatched_deck_tracker/deck_list_tile.dart';
 
-import 'deck.dart';
+import 'deck_choice_widget.dart';
 
 const MaterialColor primaryBlack = MaterialColor(
   _blackPrimaryValue,
@@ -40,44 +39,7 @@ class MyApp extends StatelessWidget {
         primarySwatch: primaryBlack,
       ),
       themeMode: ThemeMode.system,
-      home: const MyHomePage(title: 'Unmatched Deck Tracker'),
-    );
-  }
-}
-
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: FutureBuilder(
-        future: getDecksFromAssets(),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            return Center(
-              child: Text(snapshot.error! as String),
-            );
-          }
-          if (snapshot.hasData) {
-            return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: ((context, index) =>
-                    DeckListTile(snapshot.data![index])));
-          }
-          return const CircularProgressIndicator();
-        },
-      ),
+      home: const DeckChoiceWidget(title: 'Unmatched Deck Tracker'),
     );
   }
 }
