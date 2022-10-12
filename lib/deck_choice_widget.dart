@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/common_defs.dart';
 
 import 'deck.dart';
 import 'deck_list_tile.dart';
+import 'help_dialogs.dart';
 
 class ChosenDeck {
   ChosenDeck(this.decks, this.previousChoice);
@@ -25,6 +27,15 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
   bool isTwoPlayerMode = true;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
+          context: context,
+          builder: ((context) => const MainMenuHelpDialog()),
+        ));
+  }
+
+  @override
   Widget build(BuildContext context) {
     bool isChoosingFirstDeck = widget.chosenDeck == null;
 
@@ -35,13 +46,18 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
           actions: [
             IconButton(
                 onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const MainMenuHelpDialog());
+                },
+                icon: helpIcon),
+            IconButton(
+                onPressed: () {
                   setState(() {
                     isTwoPlayerMode = !isTwoPlayerMode;
                   });
                 },
-                icon: Icon(isTwoPlayerMode
-                    ? Icons.people_alt_rounded
-                    : Icons.person_rounded))
+                icon: isTwoPlayerMode ? twoPlayerIcon : onePlayerIcon),
           ],
         ),
         body: FutureBuilder(
