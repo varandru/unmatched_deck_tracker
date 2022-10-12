@@ -12,16 +12,16 @@ class DeckListView extends StatefulWidget {
   State<StatefulWidget> createState() => _DeckListViewState();
 }
 
-class _DeckListViewState extends State<DeckListView> {
+class _DeckListViewState extends State<DeckListView>
+    with AutomaticKeepAliveClientMixin {
+  _DeckListViewState() : discardPile = Deck.empty();
   late Deck deck;
-  late Deck discardPile;
+  Deck discardPile;
 
   @override
   void initState() {
     super.initState();
     deck = widget._deck;
-    discardPile = Deck.empty();
-    discardPile.cards.clear();
   }
 
   void moveCardToDiscardPile(um.Card card) {
@@ -84,6 +84,7 @@ class _DeckListViewState extends State<DeckListView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return ListView.builder(
       itemCount: deck.cards.length + discardPile.cards.length + 2,
       itemBuilder: (context, index) {
@@ -109,4 +110,7 @@ class _DeckListViewState extends State<DeckListView> {
       },
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }
