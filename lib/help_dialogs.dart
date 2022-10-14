@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/common_defs.dart';
 import 'package:unmatched_deck_tracker/settings.dart';
 
+import 'card_list_tile.dart';
+
 const Text legalDisclaimer = Text(
     "This app is not published by or affiliated with Restoration Games."
     " The card text is a copyright of Restoration Games, LLC. "
@@ -33,10 +35,24 @@ const Text oneOrTwoPlayerHelp = Text.rich(
   ),
 );
 
+const Text deckViewHelp =
+    Text("This screen is the tracker itself. It shows the descriptions "
+        "of cards in the deck and discard pile, along with the button "
+        "to move the cards to discard and back.");
+
+const Text tapOnCardText =
+    Text("\u2022 Tap on the card to expand it and read " "the card text.");
+const Text moveCardButtonText = Text.rich(TextSpan(children: <InlineSpan>[
+  TextSpan(text: "\u2022 Tap on the "),
+  WidgetSpan(child: Icon(Icons.remove)),
+  TextSpan(
+      text: " button to move the card from deck to discard pile and back."),
+]));
+
 class MainMenuHelpDialog extends StatelessWidget {
   const MainMenuHelpDialog(this.isFirstLaunch, {super.key});
 
-  final isFirstLaunch;
+  final bool isFirstLaunch;
 
   void onPressed(BuildContext context) {
     setFirstLaunch().then((value) => value
@@ -68,6 +84,36 @@ class MainMenuHelpDialog extends StatelessWidget {
               style: Theme.of(context).textTheme.headline5,
             ),
             oneOrTwoPlayerHelp,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DeckViewHelpDialog extends StatelessWidget {
+  const DeckViewHelpDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      actions: [
+        TextButton(
+            onPressed: (() => Navigator.pop(context)), child: const Text("OK")),
+      ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            legalDisclaimer,
+            Text(
+              "Help",
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            deckViewHelp,
+            tapOnCardText,
+            moveCardButtonText,
           ],
         ),
       ),

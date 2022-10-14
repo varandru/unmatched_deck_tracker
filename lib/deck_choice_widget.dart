@@ -14,22 +14,27 @@ class ChosenDeck {
 }
 
 class DeckChoiceWidget extends StatefulWidget {
-  const DeckChoiceWidget({super.key, required this.title, this.chosenDeck});
+  const DeckChoiceWidget(
+      {super.key,
+      required this.title,
+      this.chosenDeck,
+      required this.isTwoPlayerMode});
 
   final String title;
   final ChosenDeck? chosenDeck;
+  final bool isTwoPlayerMode;
 
   @override
   State<DeckChoiceWidget> createState() => _DeckChoiceWidgetState();
 }
 
 class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
-  // TODO это должно сохраняться в настройки и доставаться оттуда
-  bool isTwoPlayerMode = true;
+  bool isTwoPlayerMode = false;
 
   @override
   void initState() {
     super.initState();
+    isTwoPlayerMode = widget.isTwoPlayerMode;
     getFirstLaunch().then((value) => value
         ? WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
               context: context,
@@ -62,6 +67,7 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
                   setState(() {
                     isTwoPlayerMode = !isTwoPlayerMode;
                   });
+                  setTwoPlayerMode(isTwoPlayerMode);
                 },
                 icon: isTwoPlayerMode ? twoPlayerIcon : onePlayerIcon),
           ],

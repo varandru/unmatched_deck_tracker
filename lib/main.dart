@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/settings.dart';
 
 import 'deck_choice_widget.dart';
 
@@ -46,7 +47,15 @@ class MyApp extends StatelessWidget {
             primary: Colors.grey.shade400,
           )),
       themeMode: ThemeMode.system,
-      home: const DeckChoiceWidget(title: 'Unmatched Deck Tracker'),
+      home: FutureBuilder(
+        future: getTwoPlayerMode(),
+        builder: ((context, snapshot) => snapshot.hasData
+            ? DeckChoiceWidget(
+                title: 'Unmatched Deck Tracker',
+                isTwoPlayerMode: snapshot.data!,
+              )
+            : const CircularProgressIndicator()),
+      ),
     );
   }
 }

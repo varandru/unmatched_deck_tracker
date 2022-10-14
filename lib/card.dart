@@ -1,5 +1,7 @@
 enum CardType { attack, defence, versatile, scheme }
 
+enum CardSortType { byName, byValue, byType }
+
 CardType typeFromScheme(String type) {
   if (type == "attack") {
     return CardType.attack;
@@ -39,6 +41,90 @@ String combineCardText(String? basicText, String? immediateText,
     combinedText += "After Combat: $afterText";
   }
   return combinedText;
+}
+
+int cardSortTypeToInt(CardSortType type) {
+  switch (type) {
+    case CardSortType.byName:
+      return 0;
+    case CardSortType.byType:
+      return 1;
+    case CardSortType.byValue:
+      return 2;
+  }
+}
+
+String cardSortTypeName(CardSortType type) {
+  switch (type) {
+    case CardSortType.byName:
+      return "By Name";
+    case CardSortType.byType:
+      return "By Type";
+    case CardSortType.byValue:
+      return "By Value";
+  }
+}
+
+CardSortType intToCardSortType(int type) {
+  switch (type) {
+    case 0:
+      return CardSortType.byName;
+    case 1:
+      return CardSortType.byType;
+    default:
+      return CardSortType.byValue;
+  }
+}
+
+int sortCardsByName(Card a, Card b) => a.name.compareTo(b.name);
+
+int sortCardsByType(Card a, Card b) {
+  return Enum.compareByIndex(a.type, b.type);
+}
+
+int sortCardsByValue(Card a, Card b) {
+  if (a.value == b.value) {
+    return 0;
+  }
+  if (a.value == null && b.value != null) {
+    return 1;
+  }
+  if (a.value != null && b.value == null) {
+    return -1;
+  }
+  if (a.value! < b.value!) {
+    return -1;
+  }
+  return 1;
+}
+
+int sortCardByTypeFull(Card a, Card b) {
+  int res = 0;
+  if ((res = sortCardsByType(a, b)) == 0) {
+    if ((res = sortCardsByValue(a, b)) == 0) {
+      return sortCardsByName(a, b);
+    }
+  }
+  return res;
+}
+
+int sortCardByValueFull(Card a, Card b) {
+  int res = 0;
+  if ((res = sortCardsByValue(a, b)) == 0) {
+    return sortCardsByName(a, b);
+  }
+  return res;
+}
+
+int Function(Card, Card) getCardSort(CardSortType cardSortType) {
+  switch (cardSortType) {
+    case CardSortType.byName:
+      return sortCardsByName;
+    case CardSortType.byType:
+      return sortCardByTypeFull;
+    case CardSortType.byValue:
+      return sortCardByValueFull;
+  }
 }
 
 class Card {

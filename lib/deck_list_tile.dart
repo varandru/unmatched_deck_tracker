@@ -84,6 +84,7 @@ class DeckListTile extends StatelessWidget {
                           : DeckChoiceWidget(
                               title: "Choose a second deck",
                               chosenDeck: ChosenDeck(deckGetter(), index),
+                              isTwoPlayerMode: isTwoPlayerMode,
                             );
                     } else {
                       return TwoDecksView(deck);
