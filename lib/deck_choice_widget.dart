@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/common_defs.dart';
+import 'package:unmatched_deck_tracker/settings.dart';
 
 import 'deck.dart';
 import 'deck_list_tile.dart';
@@ -29,10 +30,15 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
-          context: context,
-          builder: ((context) => const MainMenuHelpDialog()),
-        ));
+    getFirstLaunch().then((value) => value
+        ? WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: ((context) => WillPopScope(
+                  onWillPop: (() => Future.value(false)),
+                  child: MainMenuHelpDialog(value))),
+            ))
+        : null);
   }
 
   @override
@@ -48,7 +54,7 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
                 onPressed: () {
                   showDialog(
                       context: context,
-                      builder: (context) => const MainMenuHelpDialog());
+                      builder: (context) => const MainMenuHelpDialog(false));
                 },
                 icon: helpIcon),
             IconButton(

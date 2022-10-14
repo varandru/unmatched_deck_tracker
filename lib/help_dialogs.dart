@@ -34,35 +34,42 @@ const Text oneOrTwoPlayerHelp = Text.rich(
 );
 
 class MainMenuHelpDialog extends StatelessWidget {
-  const MainMenuHelpDialog({super.key});
+  const MainMenuHelpDialog(this.isFirstLaunch, {super.key});
+
+  final isFirstLaunch;
+
+  void onPressed(BuildContext context) {
+    setFirstLaunch().then((value) => value
+        ? ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+                content: Text("This won't show up on start anymore.")),
+          )
+        : null);
+    Navigator.pop(context);
+  }
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
       actions: [
-        TextButton(
-            onPressed: (() {
-              setFirstLaunch().then((value) => value
-                  ? ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content:
-                              Text("This won't show up on start anymore.")),
-                    )
-                  : null);
-              Navigator.pop(context);
-            }),
-            child: const Text("OK")),
+        isFirstLaunch
+            ? TimeOutButton(() => onPressed(context))
+            : TextButton(
+                onPressed: (() => onPressed(context)), child: const Text("OK")),
       ],
-      content: ListView(
-        shrinkWrap: true,
-        children: [
-          legalDisclaimer,
-          Text(
-            "Help",
-            style: Theme.of(context).textTheme.headline5,
-          ),
-          oneOrTwoPlayerHelp,
-        ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            legalDisclaimer,
+            Text(
+              "Help",
+              style: Theme.of(context).textTheme.headline5,
+            ),
+            oneOrTwoPlayerHelp,
+          ],
+        ),
       ),
     );
   }
