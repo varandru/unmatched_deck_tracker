@@ -1,4 +1,4 @@
-enum CardType { attack, defence, versatile, scheme }
+enum CardType { attack, versatile, defence, scheme }
 
 enum CardSortType { byName, byValue, byType }
 

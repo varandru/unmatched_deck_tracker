@@ -48,9 +48,6 @@ class _DeckListViewState extends State<DeckListView>
       } else {
         discardPile.cards[cardInDiscardIndex].count += 1;
       }
-
-      deck.cards.sort(um.getCardSort(widget.cardSortType));
-      discardPile.cards.sort(um.getCardSort(widget.cardSortType));
     });
   }
 
@@ -77,15 +74,14 @@ class _DeckListViewState extends State<DeckListView>
       } else {
         deck.cards[cardInDeckIndex].count++;
       }
-
-      deck.cards.sort(um.getCardSort(widget.cardSortType));
-      discardPile.cards.sort(um.getCardSort(widget.cardSortType));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     super.build(context);
+    deck.cards.sort(um.getCardSort(widget.cardSortType));
+    discardPile.cards.sort(um.getCardSort(widget.cardSortType));
     return ListView.builder(
       itemCount: deck.cards.length + discardPile.cards.length + 2,
       itemBuilder: (context, index) {
