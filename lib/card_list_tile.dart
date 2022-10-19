@@ -116,6 +116,7 @@ class CardListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
+      initiallyExpanded: card.expanded,
       leading: TypeIcon(
         card.type,
         value: card.value,

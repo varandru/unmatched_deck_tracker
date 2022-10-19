@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/common_defs.dart';
 import 'package:unmatched_deck_tracker/settings.dart';
 
-import 'card_list_tile.dart';
-
 const Text legalDisclaimer = Text(
     "This app is not published by or affiliated with Restoration Games."
     " The card text is a copyright of Restoration Games, LLC. "

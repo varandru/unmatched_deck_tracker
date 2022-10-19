@@ -163,4 +163,5 @@ class Card {
   CardType type;
   String text;
   int count;
+  bool expanded = false;
 }

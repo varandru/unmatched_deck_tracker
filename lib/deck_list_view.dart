@@ -98,6 +98,7 @@ class _DeckListViewState extends State<DeckListView>
           return CardListTile(
             deck.cards[index - 1],
             onMinusTap: moveCardToDiscardPile,
+            key: ValueKey(deck.cards[index - 1].expanded),
           );
         }
         if (index == deck.cards.length + 1) {
@@ -109,6 +110,7 @@ class _DeckListViewState extends State<DeckListView>
         }
         return CardListTile(
           discardPile.cards[index - deck.cards.length - 2],
+          key: ValueKey(deck.cards[index - deck.cards.length - 2].expanded),
           onMinusTap: moveCardToDeck,
         );
       },

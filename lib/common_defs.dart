@@ -61,3 +61,42 @@ class _TimeOutButtonState extends State<TimeOutButton> {
     );
   }
 }
+
+class ExpandCollapseButton extends StatefulWidget {
+  const ExpandCollapseButton(
+      {Key? key, required this.expandAll, required this.collapseAll})
+      : super(key: key);
+
+  final VoidCallback expandAll;
+  final VoidCallback collapseAll;
+
+  @override
+  ExpandCollapseButtonState createState() => ExpandCollapseButtonState();
+}
+
+class ExpandCollapseButtonState extends State<ExpandCollapseButton> {
+  bool _allExpanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 350),
+          transitionBuilder: (child, anim) => RotationTransition(
+                turns: child.key == const ValueKey('expand')
+                    ? Tween<double>(begin: 1, end: 0.5).animate(anim)
+                    : Tween<double>(begin: 0.5, end: 1).animate(anim),
+                child: ScaleTransition(scale: anim, child: child),
+              ),
+          child: _allExpanded
+              ? const Icon(Icons.unfold_less, key: ValueKey('expand'))
+              : const Icon(Icons.unfold_more, key: ValueKey('collapse'))),
+      onPressed: () {
+        setState(() {
+          _allExpanded = !_allExpanded;
+        });
+        _allExpanded ? widget.expandAll() : widget.collapseAll();
+      },
+    );
+  }
+}
