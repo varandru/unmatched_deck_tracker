@@ -46,6 +46,13 @@ const Text moveCardButtonText = Text.rich(TextSpan(children: <InlineSpan>[
   TextSpan(
       text: " button to move the card from deck to discard pile and back."),
 ]));
+const Text expandCollapseText = Text.rich(TextSpan(children: <InlineSpan>[
+  TextSpan(text: "\u2022 Tap on the "),
+  WidgetSpan(child: Icon(Icons.unfold_less)),
+  TextSpan(text: " or "),
+  WidgetSpan(child: Icon(Icons.unfold_more)),
+  TextSpan(text: " to expand or collapse all decks."),
+]));
 
 class MainMenuHelpDialog extends StatelessWidget {
   const MainMenuHelpDialog(this.isFirstLaunch, {super.key});
@@ -112,6 +119,7 @@ class DeckViewHelpDialog extends StatelessWidget {
             deckViewHelp,
             tapOnCardText,
             moveCardButtonText,
+            expandCollapseText,
           ],
         ),
       ),
