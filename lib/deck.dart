@@ -45,9 +45,13 @@ class Deck {
         );
 
   Future<bool> fillDeckFromFile() async {
+    if (_initialized) {
+      return true;
+    }
     String encodedJson = await rootBundle.loadString(summary.filePath);
     Map<String, dynamic> json = jsonDecode(encodedJson);
     cards.clear();
+    deckCount = 0;
     for (dynamic card in json["cards"]) {
       Card parsedCard = Card.fromJson(card);
       cards.add(parsedCard);
@@ -55,6 +59,8 @@ class Deck {
     }
 
     cards.sort(((a, b) => a.name.compareTo(b.name)));
+    _initialized = true;
+    ;
 
     return true;
   }
@@ -62,6 +68,7 @@ class Deck {
   ShortDeck summary;
   List<Card> cards = [];
   int deckCount = 0;
+  bool _initialized = false;
 }
 
 Future<List<ShortDeck>> getDecksFromAssets() async {

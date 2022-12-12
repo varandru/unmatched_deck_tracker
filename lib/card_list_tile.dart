@@ -95,7 +95,10 @@ class TypeIcon extends StatelessWidget {
                   ),
                   Text(
                     "$value",
-                    style: Theme.of(context).textTheme.headlineLarge,
+                    style: Theme.of(context)
+                        .textTheme
+                        .headlineLarge!
+                        .copyWith(color: Colors.white),
                   ),
                 ],
               ),
@@ -113,6 +116,7 @@ class CardListTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExpansionTile(
+      initiallyExpanded: card.expanded,
       leading: TypeIcon(
         card.type,
         value: card.value,
@@ -129,7 +133,7 @@ class CardListTile extends StatelessWidget {
           Flexible(
             child: Text(
               card.name,
-              softWrap: false,
+              softWrap: true,
               overflow: TextOverflow.fade,
             ),
           ),

@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.unmatched_deck_tracker">
    <application
-        android:label="unmatched_deck_tracker"
+        android:label="Unmatched Deck Tracker"
         android:name="${applicationName}"
         android:icon="@mipmap/umdt_icon">
         <activity

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/common_defs.dart';
+import 'package:unmatched_deck_tracker/settings.dart';
 
 import 'deck.dart';
 import 'deck_list_tile.dart';
+import 'help_dialogs.dart';
 
 class ChosenDeck {
   ChosenDeck(this.decks, this.previousChoice);
@@ -11,18 +14,37 @@ class ChosenDeck {
 }
 
 class DeckChoiceWidget extends StatefulWidget {
-  const DeckChoiceWidget({super.key, required this.title, this.chosenDeck});
+  const DeckChoiceWidget(
+      {super.key,
+      required this.title,
+      this.chosenDeck,
+      required this.isTwoPlayerMode});
 
   final String title;
   final ChosenDeck? chosenDeck;
+  final bool isTwoPlayerMode;
 
   @override
   State<DeckChoiceWidget> createState() => _DeckChoiceWidgetState();
 }
 
 class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
-  // TODO это должно сохраняться в настройки и доставаться оттуда
-  bool isTwoPlayerMode = true;
+  bool isTwoPlayerMode = false;
+
+  @override
+  void initState() {
+    super.initState();
+    isTwoPlayerMode = widget.isTwoPlayerMode;
+    getFirstLaunch().then((value) => value
+        ? WidgetsBinding.instance.addPostFrameCallback((_) => showDialog(
+              context: context,
+              barrierDismissible: false,
+              builder: ((context) => WillPopScope(
+                  onWillPop: (() => Future.value(false)),
+                  child: MainMenuHelpDialog(value))),
+            ))
+        : null);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,13 +57,19 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
           actions: [
             IconButton(
                 onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) => const MainMenuHelpDialog(false));
+                },
+                icon: helpIcon),
+            IconButton(
+                onPressed: () {
                   setState(() {
                     isTwoPlayerMode = !isTwoPlayerMode;
                   });
+                  setTwoPlayerMode(isTwoPlayerMode);
                 },
-                icon: Icon(isTwoPlayerMode
-                    ? Icons.people_alt_rounded
-                    : Icons.person_rounded))
+                icon: isTwoPlayerMode ? twoPlayerIcon : onePlayerIcon),
           ],
         ),
         body: FutureBuilder(
