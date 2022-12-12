@@ -15,9 +15,15 @@ CardType typeFromScheme(String type) {
 }
 
 String combineCardText(String? basicText, String? immediateText,
-    String? duringText, String? afterText) {
+    String? duringText, String? afterText, String? boostTrick) {
   String combinedText = "";
+  if (boostTrick != null) {
+    combinedText += "Boost Trick: $boostTrick";
+  }
   if (basicText != null) {
+    if (combinedText.isNotEmpty) {
+      combinedText += '\n';
+    }
     combinedText += basicText;
   }
   if (immediateText != null) {
@@ -67,7 +73,7 @@ class Card {
         value = json["value"],
         boost = json["boost"],
         text = combineCardText(json["basicText"], json["immediateText"],
-            json["duringText"], json["afterText"]),
+            json["duringText"], json["afterText"], json["boostTrick"]),
         count = json["quantity"];
 
   String name;

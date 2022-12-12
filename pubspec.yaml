@@ -94,6 +94,8 @@ flutter:
     - assets/characters/TRex.json
     - assets/characters/Willow.json
     - assets/characters/Yennenga.json
+    - assets/characters/Houdini.json
+    - assets/characters/The Genie.json
 
     - assets/images/type_markers/
     - assets/images/cardbacks/
