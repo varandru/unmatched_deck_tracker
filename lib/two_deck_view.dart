@@ -19,42 +19,28 @@ class TwoDecksView extends StatefulWidget {
 class _TwoDecksViewState extends State<TwoDecksView> {
   CardSortType currentSortType = CardSortType.byName;
 
-  late Deck deck;
-  Deck? secondDeck;
+  late DeckInformation deck;
+  DeckInformation? secondDeck;
 
   void _expandAll() {
     setState(() {
-      for (var card in deck.cards) {
-        card.expanded = true;
-      }
-
-      if (secondDeck != null) {
-        for (var card in secondDeck!.cards) {
-          card.expanded = true;
-        }
-      }
+      deck.setExpanded(true);
+      secondDeck?.setExpanded(true);
     });
   }
 
   void _collapseAll() {
     setState(() {
-      for (var card in deck.cards) {
-        card.expanded = false;
-      }
-
-      if (secondDeck != null) {
-        for (var card in secondDeck!.cards) {
-          card.expanded = false;
-        }
-      }
+      deck.setExpanded(false);
+      secondDeck?.setExpanded(false);
     });
   }
 
   @override
   void initState() {
-    deck = Deck(widget.deck);
+    deck = DeckInformation(widget.deck);
     if (widget.secondDeck != null) {
-      secondDeck = Deck(widget.secondDeck!);
+      secondDeck = DeckInformation(widget.secondDeck!);
     }
     super.initState();
   }
