@@ -25,6 +25,30 @@ class _DeckListViewState extends State<DeckListView>
     deckInfo = widget._deck;
   }
 
+  void _moveFromHandToDiscard(um.Card card) {
+    setState(() => deckInfo.moveFromHandToDiscard(card));
+  }
+
+  void _moveFromHandToDeck(um.Card card) {
+    setState(() => deckInfo.moveFromHandToDeck(card));
+  }
+
+  void _moveFromDeckToDiscard(um.Card card) {
+    setState(() => deckInfo.moveFromDeckToDiscard(card));
+  }
+
+  void _moveFromDeckToHand(um.Card card) {
+    setState(() => deckInfo.moveFromDeckToHand(card));
+  }
+
+  void _moveFromDiscardToDeck(um.Card card) {
+    setState(() => deckInfo.moveFromDiscardToDeck(card));
+  }
+
+  void _moveFromDiscardToHand(um.Card card) {
+    setState(() => deckInfo.moveFromDiscardToHand(card));
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -58,13 +82,13 @@ class _DeckListViewState extends State<DeckListView>
             );
           case TileType.handCard:
             return CardListTile(deckInfo.handCardByIndex(index),
-                onMinusTap: deckInfo.moveFromHandToDiscard);
+                onMinusTap: _moveFromHandToDiscard);
           case TileType.deckCard:
             return CardListTile(deckInfo.deckCardByIndex(index),
-                onMinusTap: deckInfo.moveFromDeckToDiscard);
+                onMinusTap: _moveFromDeckToDiscard);
           case TileType.discardCard:
             return CardListTile(deckInfo.discardCardByIndex(index),
-                onMinusTap: deckInfo.moveFromDiscardToDeck);
+                onMinusTap: _moveFromDiscardToDeck);
         }
       },
     );
