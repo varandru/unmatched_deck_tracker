@@ -7,17 +7,25 @@ import 'common_defs.dart';
 const iconContainerSize = 75.0;
 const iconSize = 32.0;
 
+class InkedCallbackButtonInfo {
+  final IconData icon;
+  final Color color;
+
+  InkedCallbackButtonInfo(this.icon, this.color);
+}
+
 class InkedCallbackButton extends StatelessWidget {
-  const InkedCallbackButton(
+  InkedCallbackButton(
       {super.key,
-      required this.callback,
-      required this.color,
-      required this.icon,
-      required this.card});
+      required this.card,
+      required InkedCallbackButtonInfo info,
+      required this.callback})
+      : icon = info.icon,
+        color = info.color;
 
   final IconData icon;
-  final void Function(um.Card) callback;
   final Color color;
+  final void Function(um.Card) callback;
   final um.Card card;
 
   @override
@@ -108,10 +116,18 @@ class TypeIcon extends StatelessWidget {
 }
 
 class CardListTile extends StatelessWidget {
-  const CardListTile(this.card, {super.key, required this.onMinusTap});
+  const CardListTile(this.card,
+      {super.key,
+      required this.rightInfo,
+      required this.onRightTap,
+      required this.leftInfo,
+      required this.onLeftTap});
 
   final um.Card card;
-  final void Function(um.Card) onMinusTap;
+  final InkedCallbackButtonInfo rightInfo;
+  final void Function(um.Card) onRightTap;
+  final InkedCallbackButtonInfo leftInfo;
+  final void Function(um.Card) onLeftTap;
 
   @override
   Widget build(BuildContext context) {
@@ -121,11 +137,21 @@ class CardListTile extends StatelessWidget {
         card.type,
         value: card.value,
       ),
-      trailing: InkedCallbackButton(
-        callback: onMinusTap,
-        color: Colors.redAccent,
-        icon: Icons.remove,
-        card: card,
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          InkedCallbackButton(
+            info: leftInfo,
+            callback: onLeftTap,
+            card: card,
+          ),
+          const SizedBox(width: 3.0),
+          InkedCallbackButton(
+            info: rightInfo,
+            callback: onRightTap,
+            card: card,
+          ),
+        ],
       ),
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

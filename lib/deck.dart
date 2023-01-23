@@ -167,7 +167,7 @@ class DeckInformation {
   }
 
   Card handCardByIndex(int index) {
-    return hand.cards[index];
+    return hand.cards[index - 1];
   }
 
   Card deckCardByIndex(int index) {

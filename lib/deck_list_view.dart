@@ -49,6 +49,15 @@ class _DeckListViewState extends State<DeckListView>
     setState(() => deckInfo.moveFromDiscardToHand(card));
   }
 
+  InkedCallbackButtonInfo toDiscardInfo =
+      InkedCallbackButtonInfo(Icons.delete, Colors.red);
+
+  InkedCallbackButtonInfo toDeckInfo =
+      InkedCallbackButtonInfo(Icons.restore_from_trash, Colors.yellow.shade900);
+
+  InkedCallbackButtonInfo toHandInfo =
+      InkedCallbackButtonInfo(Icons.visibility, Colors.green.shade700);
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -61,7 +70,7 @@ class _DeckListViewState extends State<DeckListView>
             // TODO Section Header class
             return ListTile(
               title: Text(
-                "Deck count = ${deckInfo.hand.count}",
+                "Revealed cards count = ${deckInfo.hand.count}",
                 style: Theme.of(context).textTheme.headline6,
                 textAlign: TextAlign.center,
               ),
@@ -82,13 +91,22 @@ class _DeckListViewState extends State<DeckListView>
             );
           case TileType.handCard:
             return CardListTile(deckInfo.handCardByIndex(index),
-                onMinusTap: _moveFromHandToDiscard);
+                onRightTap: _moveFromHandToDiscard,
+                rightInfo: toDiscardInfo,
+                onLeftTap: _moveFromHandToDeck,
+                leftInfo: toDeckInfo);
           case TileType.deckCard:
             return CardListTile(deckInfo.deckCardByIndex(index),
-                onMinusTap: _moveFromDeckToDiscard);
+                onRightTap: _moveFromDeckToDiscard,
+                rightInfo: toDiscardInfo,
+                onLeftTap: _moveFromDeckToHand,
+                leftInfo: toHandInfo);
           case TileType.discardCard:
             return CardListTile(deckInfo.discardCardByIndex(index),
-                onMinusTap: _moveFromDiscardToDeck);
+                onRightTap: _moveFromDiscardToDeck,
+                rightInfo: toDeckInfo,
+                onLeftTap: _moveFromDiscardToHand,
+                leftInfo: toHandInfo);
         }
       },
     );
