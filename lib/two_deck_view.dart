@@ -3,6 +3,7 @@ import 'package:unmatched_deck_tracker/card.dart';
 import 'package:unmatched_deck_tracker/settings.dart';
 import 'common_defs.dart';
 import 'deck.dart';
+import 'deck_choice_widget.dart';
 import 'deck_list_view.dart';
 import 'help_dialogs.dart';
 
@@ -45,6 +46,33 @@ class _TwoDecksViewState extends State<TwoDecksView> {
     super.initState();
   }
 
+  Future<bool> willPopHelper() async {
+    bool? canReturn = await showDialog<bool>(
+        context: context,
+        builder: ((context) => const BackingOutOfDeckDialog()));
+    if (canReturn ?? false) {
+      if (!mounted) {
+        return false;
+      }
+      Navigator.of(context).popUntil((route) => route.isFirst);
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        maintainState: false,
+        builder: (context) {
+          return FutureBuilder(
+            future: getTwoPlayerMode(),
+            builder: ((context, snapshot) => snapshot.hasData
+                ? DeckChoiceWidget(
+                    title: 'Unmatched Deck Tracker',
+                    isTwoPlayerMode: snapshot.data!,
+                  )
+                : const CircularProgressIndicator()),
+          );
+        },
+      ));
+    }
+    return canReturn ?? false;
+  }
+
   @override
   Widget build(BuildContext context) {
     Future<CardSortType> cardSortType = getCardSortType();
@@ -81,26 +109,29 @@ class _TwoDecksViewState extends State<TwoDecksView> {
           cardSortType,
         ]),
         builder: (context, snapshot) => snapshot.hasData
-            ? DefaultTabController(
-                length: 2,
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: const Text("Fight!"),
-                    actions: actions,
-                    bottom: TabBar(
-                      tabs: [
-                        Tab(text: deck.summary.name),
-                        Tab(text: secondDeck!.summary.name)
-                      ],
-                      indicatorColor: Colors.grey.shade800,
+            ? WillPopScope(
+                onWillPop: willPopHelper,
+                child: DefaultTabController(
+                  length: 2,
+                  child: Scaffold(
+                    appBar: AppBar(
+                      title: const Text("Fight!"),
+                      actions: actions,
+                      bottom: TabBar(
+                        tabs: [
+                          Tab(text: deck.summary.name),
+                          Tab(text: secondDeck!.summary.name)
+                        ],
+                        indicatorColor: Colors.grey.shade800,
+                      ),
                     ),
-                  ),
-                  body: TabBarView(
-                    children: [
-                      DeckListView(deck, snapshot.data![2] as CardSortType),
-                      DeckListView(secondDeck!,
-                          currentSortType = snapshot.data![2] as CardSortType),
-                    ],
+                    body: TabBarView(
+                      children: [
+                        DeckListView(deck, snapshot.data![2] as CardSortType),
+                        DeckListView(
+                            secondDeck!, snapshot.data![2] as CardSortType),
+                      ],
+                    ),
                   ),
                 ),
               )
@@ -110,13 +141,16 @@ class _TwoDecksViewState extends State<TwoDecksView> {
       return FutureBuilder(
         future: Future.wait([deck.fillDeckFromFile(), cardSortType]),
         builder: (context, snapshot) => snapshot.hasData
-            ? Scaffold(
-                appBar: AppBar(
-                  title: Text(widget.deck.name),
-                  actions: actions,
+            ? WillPopScope(
+                onWillPop: willPopHelper,
+                child: Scaffold(
+                  appBar: AppBar(
+                    title: Text(widget.deck.name),
+                    actions: actions,
+                  ),
+                  body: DeckListView(deck,
+                      currentSortType = snapshot.data![1] as CardSortType),
                 ),
-                body: DeckListView(
-                    deck, currentSortType = snapshot.data![1] as CardSortType),
               )
             : const CircularProgressIndicator(),
       );

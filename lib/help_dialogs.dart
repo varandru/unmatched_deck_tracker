@@ -54,6 +54,29 @@ const Text expandCollapseText = Text.rich(TextSpan(children: <InlineSpan>[
   TextSpan(text: " to expand or collapse all decks."),
 ]));
 
+const Text leavingDeckView = Text("You are leaving deck view. "
+    "If you do, all tracking progress will be lost. Are you sure?");
+
+class BackingOutOfDeckDialog extends StatelessWidget {
+  const BackingOutOfDeckDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Exiting deck view"),
+      content: leavingDeckView,
+      actions: [
+        TextButton(
+            onPressed: (() => Navigator.of(context).pop(true)),
+            child: const Text("Yes")),
+        TextButton(
+            onPressed: (() => Navigator.of(context).pop(false)),
+            child: const Text("No")),
+      ],
+    );
+  }
+}
+
 class MainMenuHelpDialog extends StatelessWidget {
   const MainMenuHelpDialog(this.isFirstLaunch, {super.key});
 
