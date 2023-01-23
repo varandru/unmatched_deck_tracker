@@ -24,12 +24,10 @@ class DeckListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Color textColor = isChosen ? Colors.grey : Colors.white;
-
     TextStyle style = TextStyle(
         inherit: true,
         fontSize: Theme.of(context).textTheme.bodyMedium?.fontSize,
-        color: textColor,
+        color: Colors.white,
         shadows: const [
           Shadow(
               // bottomLeft
@@ -49,51 +47,59 @@ class DeckListTile extends StatelessWidget {
               color: Colors.black),
         ]);
 
-    return Card(
-      child: Container(
-        alignment: Alignment.bottomCenter,
-        height: 120.0,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-              fit: BoxFit.cover, image: AssetImage(getCardbackPath())),
+    Widget finalNonShadedWidget = Container(
+      alignment: Alignment.bottomCenter,
+      height: 120.0,
+      decoration: BoxDecoration(
+        image: DecorationImage(
+            fit: BoxFit.cover, image: AssetImage(getCardbackPath())),
+      ),
+      child: ListTile(
+        title: Text(deck.name,
+            style: style.copyWith(
+                fontSize: Theme.of(context).textTheme.titleLarge?.fontSize)),
+        subtitle: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(deck.heroName, style: style),
+            Text("${deck.hp} HP", style: style),
+            Text("${deck.move} move", style: style)
+          ],
         ),
-        child: ListTile(
-          title: Text(deck.name,
-              style: style.copyWith(
-                  fontSize: Theme.of(context).textTheme.titleLarge?.fontSize)),
-          subtitle: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(deck.heroName, style: style),
-              Text("${deck.hp} HP", style: style),
-              Text("${deck.move} move", style: style)
-            ],
-          ),
-          selected: isChosen,
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                  maintainState: false,
-                  builder: (context) {
-                    if (isTwoPlayerMode) {
-                      return previousChoice() != null
-                          ? TwoDecksView(
-                              deckGetter()[previousChoice()!],
-                              secondDeck: deck,
-                            )
-                          : DeckChoiceWidget(
-                              title: "Choose a second deck",
-                              chosenDeck: ChosenDeck(deckGetter(), index),
-                              isTwoPlayerMode: isTwoPlayerMode,
-                            );
-                    } else {
-                      return TwoDecksView(deck);
-                    }
-                  }),
-            );
-          },
-        ),
+        selected: isChosen,
+        onTap: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+                maintainState: false,
+                builder: (context) {
+                  if (isTwoPlayerMode) {
+                    return previousChoice() != null
+                        ? TwoDecksView(
+                            deckGetter()[previousChoice()!],
+                            secondDeck: deck,
+                          )
+                        : DeckChoiceWidget(
+                            title: "Choose a second deck",
+                            chosenDeck: ChosenDeck(deckGetter(), index),
+                            isTwoPlayerMode: isTwoPlayerMode,
+                          );
+                  } else {
+                    return TwoDecksView(deck);
+                  }
+                }),
+          );
+        },
       ),
     );
+
+    return isChosen
+        ? Card(
+            child: ColorFiltered(
+                colorFilter: const ColorFilter.mode(
+                  Colors.grey,
+                  BlendMode.saturation,
+                ),
+                child: finalNonShadedWidget))
+        : Card(child: finalNonShadedWidget);
   }
 }
