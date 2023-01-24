@@ -1,0 +1,3 @@
+[submodule "unmatched_deck_tracker_assets"]
+	path = unmatched_deck_tracker_assets
+	url = git@github.com:varandru/unmatched_deck_tracker_assets.git
