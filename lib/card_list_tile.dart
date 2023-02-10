@@ -50,13 +50,13 @@ class TypeIcon extends StatelessWidget {
   String assetPath() {
     switch (type) {
       case CardType.attack:
-        return "assets/images/type_markers/attack.svg";
+        return "unmatched_deck_tracker_assets/images/type_markers/attack.svg";
       case CardType.defence:
-        return "assets/images/type_markers/defence.svg";
+        return "unmatched_deck_tracker_assets/images/type_markers/defence.svg";
       case CardType.versatile:
-        return "assets/images/type_markers/versatile.svg";
+        return "unmatched_deck_tracker_assets/images/type_markers/versatile.svg";
       case CardType.scheme:
-        return "assets/images/type_markers/scheme.svg";
+        return "unmatched_deck_tracker_assets/images/type_markers/scheme.svg";
     }
   }
 

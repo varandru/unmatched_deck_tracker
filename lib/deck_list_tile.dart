@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/deck_choice_widget.dart';
+import 'package:unmatched_deck_tracker/set.dart';
 
 import 'deck.dart';
 import 'two_deck_view.dart';
@@ -15,12 +16,13 @@ class DeckListTile extends StatelessWidget {
 
   final ShortDeck deck;
   final int index;
-  final ValueGetter<List<ShortDeck>> deckGetter;
-  final ValueGetter<int?> previousChoice;
+  final ValueGetter<List<ReleaseSet>> deckGetter;
+  final ValueGetter<ShortDeck?> previousChoice;
   final bool isChosen;
   final bool isTwoPlayerMode;
 
-  String getCardbackPath() => "assets/images/cardbacks/${deck.name}.jpg";
+  String getCardbackPath() =>
+      "unmatched_deck_tracker_assets/images/cardbacks/${deck.name}.jpg";
 
   @override
   Widget build(BuildContext context) {
@@ -75,12 +77,12 @@ class DeckListTile extends StatelessWidget {
                   if (isTwoPlayerMode) {
                     return previousChoice() != null
                         ? TwoDecksView(
-                            deckGetter()[previousChoice()!],
+                            previousChoice()!,
                             secondDeck: deck,
                           )
                         : DeckChoiceWidget(
                             title: "Choose a second deck",
-                            chosenDeck: ChosenDeck(deckGetter(), index),
+                            chosenDeck: ChosenDeck(deckGetter(), deck),
                             isTwoPlayerMode: isTwoPlayerMode,
                           );
                   } else {

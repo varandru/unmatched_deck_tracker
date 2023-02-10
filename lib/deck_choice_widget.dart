@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/common_defs.dart';
+import 'package:unmatched_deck_tracker/set.dart';
 import 'package:unmatched_deck_tracker/settings.dart';
 
 import 'deck.dart';
-import 'deck_list_tile.dart';
 import 'help_dialogs.dart';
+import 'set_widget.dart';
 
 class ChosenDeck {
-  ChosenDeck(this.decks, this.previousChoice);
+  ChosenDeck(this.sets, this.previousChoice);
 
-  List<ShortDeck> decks;
-  int previousChoice;
+  List<ReleaseSet> sets;
+  ShortDeck previousChoice;
 }
 
 class DeckChoiceWidget extends StatefulWidget {
@@ -30,6 +31,19 @@ class DeckChoiceWidget extends StatefulWidget {
 
 class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
   bool isTwoPlayerMode = false;
+
+  Future<List<ReleaseSet>> loadFromMemory() async {
+    var decks = await getDecksFromAssets();
+    var sets = await getReleaseSets();
+
+    for (var set in sets) {
+      if (!set.loadCharacters(decks)) {
+        throw Exception("Couldn't load set ${set.name}");
+      }
+    }
+
+    return sets;
+  }
 
   @override
   void initState() {
@@ -73,7 +87,7 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
           ],
         ),
         body: FutureBuilder(
-          future: getDecksFromAssets(),
+          future: loadFromMemory(),
           builder: (context, snapshot) {
             if (snapshot.hasError) {
               return Center(
@@ -83,12 +97,11 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
             if (snapshot.hasData) {
               return ListView.builder(
                   itemCount: snapshot.data!.length,
-                  itemBuilder: ((context, index) => DeckListTile(
+                  itemBuilder: ((context, index) => SetWidget(
                         snapshot.data![index],
-                        index: index,
-                        deckGetter: () => snapshot.data!,
-                        previousChoice: () => widget.chosenDeck?.previousChoice,
                         isTwoPlayerMode: isTwoPlayerMode,
+                        deckGetter: () => snapshot.data!,
+                        key: ValueKey(snapshot.data![index].name),
                       )));
             }
             return const CircularProgressIndicator();
@@ -101,14 +114,13 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
           title: Text(widget.title),
         ),
         body: ListView.builder(
-            itemCount: widget.chosenDeck!.decks.length,
-            itemBuilder: ((context, index) => DeckListTile(
-                  widget.chosenDeck!.decks[index],
-                  index: index,
-                  isChosen: index == widget.chosenDeck!.previousChoice,
-                  deckGetter: () => widget.chosenDeck!.decks,
-                  previousChoice: () => widget.chosenDeck!.previousChoice,
+            itemCount: widget.chosenDeck!.sets.length,
+            itemBuilder: ((context, index) => SetWidget(
+                  widget.chosenDeck!.sets[index],
                   isTwoPlayerMode: isTwoPlayerMode,
+                  deckGetter: () => widget.chosenDeck!.sets,
+                  previousChoice: widget.chosenDeck!.previousChoice,
+                  key: ValueKey(widget.chosenDeck!.sets[index].name),
                 ))),
       );
     }
