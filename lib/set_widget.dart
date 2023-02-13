@@ -4,7 +4,7 @@ import 'package:unmatched_deck_tracker/deck.dart';
 import 'deck_list_tile.dart';
 import 'set.dart';
 
-class SetWidget extends StatelessWidget {
+class SetWidget extends StatefulWidget {
   const SetWidget(
     this.set, {
     required this.isTwoPlayerMode,
@@ -19,21 +19,30 @@ class SetWidget extends StatelessWidget {
   final ValueGetter<List<ReleaseSet>> deckGetter;
 
   @override
-  Widget build(BuildContext context) =>
-      ExpansionTile(title: Text(set.name), initiallyExpanded: true, children: [
-        ListView.builder(
-            itemCount: set.characters.length,
-            shrinkWrap: true,
-            primary: false,
-            itemBuilder: ((context, index) => DeckListTile(
-                  set.characters[index],
-                  index: index,
-                  deckGetter: deckGetter,
-                  previousChoice: () => previousChoice,
-                  isTwoPlayerMode: isTwoPlayerMode,
-                  isChosen: previousChoice != null
-                      ? set.characters[index] == previousChoice!
-                      : false,
-                )))
-      ]);
+  State<SetWidget> createState() => _SetWidgetState();
+}
+
+class _SetWidgetState extends State<SetWidget> {
+  @override
+  Widget build(BuildContext context) => ExpansionTile(
+        title: Text(widget.set.name),
+        key: widget.key,
+        initiallyExpanded: true,
+        children: [
+          ListView.builder(
+              itemCount: widget.set.characters.length,
+              shrinkWrap: true,
+              primary: false,
+              itemBuilder: ((context, index) => DeckListTile(
+                    widget.set.characters[index],
+                    index: index,
+                    deckGetter: widget.deckGetter,
+                    previousChoice: () => widget.previousChoice,
+                    isTwoPlayerMode: widget.isTwoPlayerMode,
+                    isChosen: widget.previousChoice != null
+                        ? widget.set.characters[index] == widget.previousChoice!
+                        : false,
+                  )))
+        ],
+      );
 }

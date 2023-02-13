@@ -31,6 +31,7 @@ class DeckChoiceWidget extends StatefulWidget {
 
 class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
   bool isTwoPlayerMode = false;
+  final PageStorageBucket _bucket = PageStorageBucket();
 
   Future<List<ReleaseSet>> loadFromMemory() async {
     var decks = await getDecksFromAssets();
@@ -58,6 +59,28 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
                   child: MainMenuHelpDialog(value))),
             ))
         : null);
+  }
+
+  Widget buildSetWidgets(
+      List<ReleaseSet> releaseSets, ShortDeck? previousChoice) {
+    List<Widget> sets = [];
+    for (var set in releaseSets) {
+      sets.add(SetWidget(
+        set,
+        isTwoPlayerMode: isTwoPlayerMode,
+        deckGetter: () => releaseSets,
+        previousChoice: previousChoice,
+        key: PageStorageKey<String>(set.name),
+      ));
+    }
+
+    return PageStorage(
+      bucket: _bucket,
+      child: ListView(
+        primary: true,
+        children: sets,
+      ),
+    );
   }
 
   @override
@@ -95,14 +118,13 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
               );
             }
             if (snapshot.hasData) {
-              return ListView.builder(
-                  itemCount: snapshot.data!.length,
-                  itemBuilder: ((context, index) => SetWidget(
-                        snapshot.data![index],
-                        isTwoPlayerMode: isTwoPlayerMode,
-                        deckGetter: () => snapshot.data!,
-                        key: ValueKey(snapshot.data![index].name),
-                      )));
+              return PageStorage(
+                bucket: _bucket,
+                child: buildSetWidgets(
+                  snapshot.data!,
+                  null,
+                ),
+              );
             }
             return const CircularProgressIndicator();
           },
@@ -113,15 +135,10 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
         appBar: AppBar(
           title: Text(widget.title),
         ),
-        body: ListView.builder(
-            itemCount: widget.chosenDeck!.sets.length,
-            itemBuilder: ((context, index) => SetWidget(
-                  widget.chosenDeck!.sets[index],
-                  isTwoPlayerMode: isTwoPlayerMode,
-                  deckGetter: () => widget.chosenDeck!.sets,
-                  previousChoice: widget.chosenDeck!.previousChoice,
-                  key: ValueKey(widget.chosenDeck!.sets[index].name),
-                ))),
+        body: buildSetWidgets(
+          widget.chosenDeck!.sets,
+          widget.chosenDeck!.previousChoice,
+        ),
       );
     }
   }
