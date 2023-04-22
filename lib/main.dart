@@ -47,15 +47,7 @@ class MyApp extends StatelessWidget {
             primary: Colors.grey.shade400,
           )),
       themeMode: ThemeMode.system,
-      home: FutureBuilder(
-        future: getTwoPlayerMode(),
-        builder: ((context, snapshot) => snapshot.hasData
-            ? DeckChoiceWidget(
-                title: 'Unmatched Deck Tracker',
-                isTwoPlayerMode: snapshot.data!,
-              )
-            : const CircularProgressIndicator()),
-      ),
+      home: createDefaultDeckChoice(context),
     );
   }
 }

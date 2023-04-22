@@ -3,6 +3,7 @@ import 'package:unmatched_deck_tracker/deck_choice_widget.dart';
 import 'package:unmatched_deck_tracker/set.dart';
 
 import 'deck.dart';
+import 'image_handling.dart';
 import 'two_deck_view.dart';
 
 class DeckListTile extends StatelessWidget {
@@ -20,9 +21,6 @@ class DeckListTile extends StatelessWidget {
   final ValueGetter<ShortDeck?> previousChoice;
   final bool isChosen;
   final bool isTwoPlayerMode;
-
-  String getCardbackPath() =>
-      "unmatched_deck_tracker_assets/images/cardbacks/${deck.name}.jpg";
 
   @override
   Widget build(BuildContext context) {
@@ -54,7 +52,7 @@ class DeckListTile extends StatelessWidget {
       height: 120.0,
       decoration: BoxDecoration(
         image: DecorationImage(
-            fit: BoxFit.cover, image: AssetImage(getCardbackPath())),
+            fit: BoxFit.cover, image: getCardbackByName(deck.name)),
       ),
       child: ListTile(
         title: Text(deck.name,

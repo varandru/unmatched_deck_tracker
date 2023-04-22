@@ -1,17 +1,35 @@
 import 'package:flutter/material.dart';
-import 'package:unmatched_deck_tracker/common_defs.dart';
-import 'package:unmatched_deck_tracker/set.dart';
-import 'package:unmatched_deck_tracker/settings.dart';
+import 'package:unmatched_deck_tracker/sidebar.dart';
 
+import 'common_defs.dart';
+import 'set.dart';
+import 'settings.dart';
 import 'deck.dart';
 import 'help_dialogs.dart';
 import 'set_widget.dart';
+import 'arsenal_widget.dart' show goToArsenal;
 
 class ChosenDeck {
   ChosenDeck(this.sets, this.previousChoice);
 
   List<ReleaseSet> sets;
   ShortDeck previousChoice;
+}
+
+Widget createDefaultDeckChoice(BuildContext context) => FutureBuilder(
+      future: getTwoPlayerMode(),
+      builder: ((context, snapshot) => snapshot.hasData
+          ? DeckChoiceWidget(
+              title: 'Unmatched Deck Tracker',
+              isTwoPlayerMode: snapshot.data!,
+            )
+          : const CircularProgressIndicator()),
+    );
+
+void goToDeckChoice(BuildContext context) {
+  Navigator.of(context).pushReplacement(
+    MaterialPageRoute(builder: (context) => createDefaultDeckChoice(context)),
+  );
 }
 
 class DeckChoiceWidget extends StatefulWidget {
@@ -109,6 +127,8 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
                 icon: isTwoPlayerMode ? twoPlayerIcon : onePlayerIcon),
           ],
         ),
+        drawer: const Sidebar(SidebarPosition.deckChoice,
+            openDeckChoice: goToDeckChoice, openArsenal: goToArsenal),
         body: FutureBuilder(
           future: loadFromMemory(),
           builder: (context, snapshot) {
