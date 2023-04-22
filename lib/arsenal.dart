@@ -95,6 +95,10 @@ class ArsenalDraft {
     pool.removeWhere((element) => pick.leaderPicks.contains(element));
     pool.removeWhere((element) => pick.followerPicks.contains(element));
 
+    if (pool.isEmpty) {
+      pool.addAll(bannedCharacters);
+    }
+
     if (leaderChoice.length != followerChoice.length) {
       throw Exception("Somehow different amount of picks. "
           "Leader: ${leaderChoice.toString()}. "
