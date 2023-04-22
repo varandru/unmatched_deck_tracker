@@ -2,6 +2,14 @@ import 'package:unmatched_deck_tracker/deck.dart';
 
 const int ARSENAL_SIZE = 4;
 
+enum CurrentArsenalState {
+  leaderIsPicking,
+  leaderPassesPhone,
+  followerIsPicking,
+  roundResult,
+  draftResult
+}
+
 class RoundPick {
   Set<String> leaderPicks = Set.identity();
   Set<String> commonPicks = Set.identity();
@@ -11,31 +19,49 @@ class RoundPick {
 class ArsenalDraft {
   ArsenalDraft();
 
-  Set<String> pool = Set.identity();
+  List<String> pool = [];
 
   Set<String> leaderChoice = Set.identity();
-  Set<String> leaderHiddenPicks = Set.identity();
   Set<String> followerChoice = Set.identity();
-  Set<String> followerHiddenPicks = Set.identity();
+  Set<String> bannedCharacters = Set.identity();
 
+  Set<String> leaderHiddenPicks = Set.identity();
+  Set<String> followerHiddenPicks = Set.identity();
   Set<String> currentPicks = Set.identity();
 
   bool leaderIsPicking = true;
 
   List<RoundPick> roundHistory = [];
 
-  void init(List<ShortDeck> decks) {
-    pool = Set.from(decks.map((e) => e.name).toSet());
+  void reset(List<ShortDeck> decks) {
+    pool = List.from(decks.map((e) => e.name).toList());
+    leaderChoice.clear();
+    followerChoice.clear();
+    bannedCharacters.clear();
+    leaderHiddenPicks.clear();
+    followerHiddenPicks.clear();
+    currentPicks.clear();
+  }
+
+  bool sanityCheck(CurrentArsenalState state) {
+    switch (state) {
+      case CurrentArsenalState.leaderIsPicking:
+        return leaderIsPicking == true;
+      case CurrentArsenalState.followerIsPicking:
+        return leaderIsPicking == false;
+      case CurrentArsenalState.leaderPassesPhone:
+      case CurrentArsenalState.roundResult:
+      case CurrentArsenalState.draftResult:
+        return true;
+    }
   }
 
   void _movePoolToLeader() {
-    pool.removeAll(currentPicks);
     leaderHiddenPicks.addAll(currentPicks);
     currentPicks.clear();
   }
 
   void _movePoolToFollower() {
-    pool.removeAll(currentPicks);
     followerHiddenPicks.addAll(currentPicks);
     currentPicks.clear();
   }
@@ -52,17 +78,22 @@ class ArsenalDraft {
 
   bool nextRound() {
     RoundPick pick = RoundPick();
+
     pick.commonPicks = leaderHiddenPicks.intersection(followerHiddenPicks);
     pick.leaderPicks = leaderHiddenPicks.difference(followerHiddenPicks);
     pick.followerPicks = followerHiddenPicks.difference(leaderHiddenPicks);
 
     leaderChoice.addAll(pick.leaderPicks);
     followerChoice.addAll(pick.followerPicks);
+    bannedCharacters.addAll(pick.commonPicks);
 
     roundHistory.add(pick);
 
     leaderHiddenPicks.clear();
     followerHiddenPicks.clear();
+    pool.removeWhere((element) => pick.commonPicks.contains(element));
+    pool.removeWhere((element) => pick.leaderPicks.contains(element));
+    pool.removeWhere((element) => pick.followerPicks.contains(element));
 
     if (leaderChoice.length != followerChoice.length) {
       throw Exception("Somehow different amount of picks. "
