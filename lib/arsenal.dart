@@ -7,7 +7,9 @@ enum CurrentArsenalState {
   leaderPassesPhone,
   followerIsPicking,
   roundResult,
-  draftResult
+  draftResult,
+  leaderIsAssigning,
+  followerIsAssigning
 }
 
 class RoundPick {
@@ -52,6 +54,8 @@ class ArsenalDraft {
       case CurrentArsenalState.leaderPassesPhone:
       case CurrentArsenalState.roundResult:
       case CurrentArsenalState.draftResult:
+      case CurrentArsenalState.leaderIsAssigning:
+      case CurrentArsenalState.followerIsAssigning:
         return true;
     }
   }
@@ -76,7 +80,9 @@ class ArsenalDraft {
     }
   }
 
-  bool nextRound() {
+  bool get draftEnded => leaderChoice.length == ARSENAL_SIZE;
+
+  void nextRound() {
     RoundPick pick = RoundPick();
 
     pick.commonPicks = leaderHiddenPicks.intersection(followerHiddenPicks);
@@ -106,8 +112,6 @@ class ArsenalDraft {
     }
 
     leaderIsPicking = true;
-
-    return leaderChoice.length == ARSENAL_SIZE;
   }
 
   bool confirmSelection() {
@@ -160,4 +164,197 @@ class ArsenalDraft {
   }
 
   Set<String> get picks => leaderIsPicking ? leaderChoice : followerChoice;
+}
+
+enum ArsenalAssignment {
+  leaderAdvantage,
+  followerAdvantage,
+  neutral,
+}
+
+String getPickNameFromEnum(ArsenalAssignment assignment) {
+  switch (assignment) {
+    case ArsenalAssignment.leaderAdvantage:
+      return "Leader Advantage";
+    case ArsenalAssignment.followerAdvantage:
+      return "Follower Advantage";
+    case ArsenalAssignment.neutral:
+      return "Neutral game";
+  }
+}
+
+bool getMapPickFromEnum(ArsenalAssignment assignment) {
+  switch (assignment) {
+    case ArsenalAssignment.leaderAdvantage:
+      return true;
+    case ArsenalAssignment.followerAdvantage:
+      return false;
+    case ArsenalAssignment.neutral:
+      return true;
+  }
+}
+
+bool getPositionPickFromEnum(ArsenalAssignment assignment) {
+  switch (assignment) {
+    case ArsenalAssignment.leaderAdvantage:
+      return true;
+    case ArsenalAssignment.followerAdvantage:
+      return false;
+    case ArsenalAssignment.neutral:
+      return false;
+  }
+}
+
+class PositionPick {
+  PositionPick(ArsenalAssignment assignment)
+      : leaderHasMapPick = getMapPickFromEnum(assignment),
+        leaderHasPositionPick = getPositionPickFromEnum(assignment);
+
+  String leaderPick = "";
+  String followerPick = "";
+
+  final bool leaderHasMapPick;
+  final bool leaderHasPositionPick;
+
+  bool filled(bool isLeaderPicking) =>
+      isLeaderPicking ? leaderPick.isNotEmpty : followerPick.isNotEmpty;
+
+  bool leaderFighterAvailable(String fighter) =>
+      leaderPick.isEmpty ? true : leaderPick == fighter;
+  bool followerFighterAvailable(String fighter) =>
+      followerPick.isEmpty ? true : followerPick == fighter;
+
+  void removeLeaderFighter(String fighter) {
+    if (leaderPick == fighter) {
+      leaderPick = "";
+    }
+  }
+
+  void removeFollowerFighter(String fighter) {
+    if (followerPick == fighter) {
+      followerPick = "";
+    }
+  }
+
+  void clear() {
+    leaderPick = followerPick = "";
+  }
+}
+
+class ArsenalAssignments {
+  ArsenalAssignments();
+
+  PositionPick leaderAdvantage =
+      PositionPick(ArsenalAssignment.leaderAdvantage);
+  PositionPick followerAdvantage =
+      PositionPick(ArsenalAssignment.followerAdvantage);
+  PositionPick neutralGame = PositionPick(ArsenalAssignment.neutral);
+
+  Set<String> leaderFighters = Set.identity();
+  Set<String> followerFighters = Set.identity();
+
+  bool get inited => leaderFighters.isNotEmpty && followerFighters.isNotEmpty;
+
+  bool leaderIsAssigning = true;
+
+  bool _leaderFighterAvailable(String fighter) =>
+      leaderAdvantage.leaderFighterAvailable(fighter) &&
+      followerAdvantage.leaderFighterAvailable(fighter) &&
+      neutralGame.leaderFighterAvailable(fighter);
+
+  bool _followerFighterAvailable(String fighter) =>
+      leaderAdvantage.followerFighterAvailable(fighter) &&
+      followerAdvantage.followerFighterAvailable(fighter) &&
+      neutralGame.followerFighterAvailable(fighter);
+
+  void initialize(Set<String> leaderPicks, Set<String> followerPicks) {
+    leaderFighters = leaderPicks;
+    followerFighters = followerPicks;
+    print('Leader has $leaderFighters');
+    print('Follower has $followerFighters');
+  }
+
+  void assignMyAdvantage(String fighter) {
+    if (leaderIsAssigning) {
+      _clearLeader(fighter);
+      leaderAdvantage.leaderPick = fighter;
+    } else {
+      _clearFollower(fighter);
+      followerAdvantage.followerPick = fighter;
+    }
+  }
+
+  void assignYourAdvantage(String fighter) {
+    if (leaderIsAssigning) {
+      _clearLeader(fighter);
+      followerAdvantage.leaderPick = fighter;
+    } else {
+      _clearFollower(fighter);
+      leaderAdvantage.followerPick = fighter;
+    }
+  }
+
+  void assignNeutral(String fighter) {
+    if (leaderIsAssigning) {
+      _clearLeader(fighter);
+      neutralGame.leaderPick = fighter;
+    } else {
+      _clearFollower(fighter);
+      neutralGame.followerPick = fighter;
+    }
+  }
+
+  bool get filled =>
+      leaderAdvantage.filled(leaderIsAssigning) &&
+      followerAdvantage.filled(leaderIsAssigning) &&
+      neutralGame.filled(leaderIsAssigning);
+
+  Set<String> get myFighters =>
+      leaderIsAssigning ? leaderFighters : followerFighters;
+
+  Set<String> get yourFighters =>
+      leaderIsAssigning ? followerFighters : leaderFighters;
+
+  String? get myAdvantage => leaderIsAssigning
+      ? (leaderAdvantage.leaderPick.isEmpty ? null : leaderAdvantage.leaderPick)
+      : (followerAdvantage.followerPick.isEmpty
+          ? null
+          : followerAdvantage.followerPick);
+
+  String? get yourAdvantage => leaderIsAssigning
+      ? (followerAdvantage.leaderPick.isEmpty
+          ? null
+          : followerAdvantage.leaderPick)
+      : (leaderAdvantage.followerPick.isEmpty
+          ? null
+          : leaderAdvantage.followerPick);
+
+  String? get neutralPick => leaderIsAssigning
+      ? (neutralGame.leaderPick.isEmpty ? null : neutralGame.leaderPick)
+      : (neutralGame.followerPick.isEmpty ? null : neutralGame.followerPick);
+
+  void clear() {
+    leaderAdvantage.clear();
+    followerAdvantage.clear();
+    neutralGame.clear();
+    leaderIsAssigning = true;
+    leaderFighters.clear();
+    followerFighters.clear();
+  }
+
+  void _clearLeader(String fighter) {
+    if (!_leaderFighterAvailable(fighter)) {
+      leaderAdvantage.removeLeaderFighter(fighter);
+      followerAdvantage.removeLeaderFighter(fighter);
+      neutralGame.removeLeaderFighter(fighter);
+    }
+  }
+
+  void _clearFollower(String fighter) {
+    if (!_followerFighterAvailable(fighter)) {
+      leaderAdvantage.removeFollowerFighter(fighter);
+      followerAdvantage.removeFollowerFighter(fighter);
+      neutralGame.removeFollowerFighter(fighter);
+    }
+  }
 }

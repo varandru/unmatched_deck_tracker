@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:unmatched_deck_tracker/settings.dart';
 
 import 'deck_choice_widget.dart';
 

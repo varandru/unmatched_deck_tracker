@@ -21,6 +21,7 @@ class ArsenalBaseWidget extends StatefulWidget {
 
 class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
   final ArsenalDraft _draft = ArsenalDraft();
+  final ArsenalAssignments _assignments = ArsenalAssignments();
   List<ShortDeck> _decks = [];
   bool _loaded = false;
   CurrentArsenalState _arsenalState = CurrentArsenalState.leaderIsPicking;
@@ -35,18 +36,29 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
           _arsenalState = CurrentArsenalState.followerIsPicking;
           break;
         case CurrentArsenalState.followerIsPicking:
-          bool draftEnded = _draft.nextRound();
-          _arsenalState = draftEnded
-              ? CurrentArsenalState.draftResult
-              : CurrentArsenalState.roundResult;
+          _draft.nextRound();
+          _arsenalState = CurrentArsenalState.roundResult;
           break;
         case CurrentArsenalState.roundResult:
-          _arsenalState = CurrentArsenalState.leaderIsPicking;
+          _arsenalState = _draft.draftEnded
+              ? CurrentArsenalState.leaderIsAssigning
+              : CurrentArsenalState.leaderIsPicking;
+          if (_draft.draftEnded) {
+            _assignments.initialize(_draft.leaderChoice, _draft.followerChoice);
+          }
           break;
         case CurrentArsenalState.draftResult:
           // We shouldn't get here. If we do, I guess we're restarting the draft?
           _arsenalState = CurrentArsenalState.leaderIsPicking;
           _draft.reset(_decks);
+          _assignments.clear();
+          break;
+        case CurrentArsenalState.leaderIsAssigning:
+          _arsenalState = CurrentArsenalState.followerIsAssigning;
+          _assignments.leaderIsAssigning = false;
+          break;
+        case CurrentArsenalState.followerIsAssigning:
+          _arsenalState = CurrentArsenalState.draftResult;
           break;
       }
     });
@@ -64,6 +76,10 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
         return "Round result";
       case CurrentArsenalState.draftResult:
         return "Draft Result";
+      case CurrentArsenalState.leaderIsAssigning:
+        return "Leader Assignments";
+      case CurrentArsenalState.followerIsAssigning:
+        return "Follower Assignments";
     }
   }
 
@@ -129,6 +145,26 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
         );
         bottomNavigationBar = DraftResultBottomBar(_goToNextState);
         break;
+      case CurrentArsenalState.leaderIsAssigning:
+      case CurrentArsenalState.followerIsAssigning:
+        body = ArsenalAssignmentsBody(
+          myFighters: _assignments.myFighters,
+          yourFighters: _assignments.yourFighters,
+          assignMyAdvantage: (hero) =>
+              setState(() => _assignments.assignMyAdvantage(hero)),
+          assignNeutral: (hero) =>
+              setState(() => _assignments.assignNeutral(hero)),
+          assignYourAdvantage: (hero) =>
+              setState(() => _assignments.assignYourAdvantage(hero)),
+          yourAdvantage: _assignments.yourAdvantage,
+          myAdvantage: _assignments.myAdvantage,
+          neutralPick: _assignments.neutralPick,
+        );
+        print("Filled? ${_assignments.filled}");
+        bottomNavigationBar = ArsenalAssignmentsBottomBar(_goToNextState,
+            active: _assignments.filled,
+            leaderIsAssigning: _assignments.leaderIsAssigning);
+        break;
     }
 
     return Scaffold(
@@ -188,6 +224,7 @@ class PickView extends StatelessWidget {
   Widget build(BuildContext context) {
     return HeroView(
       heroes: draft.pool,
+      cardType: DeckChoiceCardType.selectable,
       scrollable: true,
       currentPicks: draft.currentPicks,
       clickedCharacter: clickedCharacter,
@@ -204,11 +241,13 @@ class HeroView extends StatelessWidget {
     required this.scrollable,
     this.cardPerRow = 4,
     this.spacing = 4.0,
+    required this.cardType,
   }) : super(key: key);
 
   final List<String> heroes;
   final Set<String>? currentPicks;
   final bool scrollable;
+  final DeckChoiceCardType cardType;
   final void Function(String)? clickedCharacter;
 
   final int cardPerRow;
@@ -235,6 +274,7 @@ class HeroView extends StatelessWidget {
 
       cardbacks.add(DeckChoiceCard(
         heroName,
+        cardType,
         fighterSelected: fighterSelected,
         isSelected: selected,
         cardWidth: cardWidth,
@@ -253,23 +293,26 @@ class HeroView extends StatelessWidget {
   }
 }
 
+enum DeckChoiceCardType { display, selectable, draggable }
+
 class DeckChoiceCard extends StatelessWidget {
   const DeckChoiceCard(
-    this.deckName, {
+    this.deckName,
+    this.cardType, {
     this.fighterSelected,
     bool? isSelected,
     required this.cardWidth,
     super.key,
-  })  : _isSelected = isSelected ?? false,
-        _isClickable = fighterSelected != null;
+  }) : _isSelected = isSelected ?? false;
 
   final String deckName;
   final VoidCallback? fighterSelected;
   final double cardWidth;
   final double heightFactor = 1.5;
 
+  final DeckChoiceCardType cardType;
+
   final bool _isSelected;
-  final bool _isClickable;
 
   @override
   Widget build(BuildContext context) {
@@ -283,19 +326,25 @@ class DeckChoiceCard extends StatelessWidget {
           image: getCardbackByName(deckName),
         ),
       ),
-      child: _isClickable
+      child: cardType == DeckChoiceCardType.selectable
           ? Center(
               child: _isSelected
                   ? const Icon(Icons.check_circle, size: 50.0)
                   : null)
           : null,
     );
-    return _isClickable
-        ? InkWell(
-            onTap: fighterSelected,
-            child: card,
-          )
-        : card;
+
+    switch (cardType) {
+      case DeckChoiceCardType.display:
+        return card;
+      case DeckChoiceCardType.selectable:
+        return InkWell(
+          onTap: fighterSelected,
+          child: card,
+        );
+      case DeckChoiceCardType.draggable:
+        return Draggable<String>(feedback: card, data: deckName, child: card);
+    }
   }
 }
 
@@ -351,6 +400,7 @@ class RoundResult extends StatelessWidget {
           textScaleFactor: scaleFactor, textAlign: TextAlign.center));
       children.add(HeroView(
           heroes: leaderPicks.difference(roundPick.leaderPicks).toList(),
+          cardType: DeckChoiceCardType.display,
           scrollable: false,
           cardPerRow: cardsPerRow));
     }
@@ -359,14 +409,16 @@ class RoundResult extends StatelessWidget {
           textScaleFactor: scaleFactor, textAlign: TextAlign.center));
       children.add(HeroView(
           heroes: roundPick.leaderPicks.toList(),
+          cardType: DeckChoiceCardType.display,
           scrollable: false,
           cardPerRow: cardsPerRow));
     }
-    if (roundPick.leaderPicks.isNotEmpty) {
+    if (roundPick.commonPicks.isNotEmpty) {
       children.add(Text("Banned characters are",
           textScaleFactor: scaleFactor, textAlign: TextAlign.center));
       children.add(HeroView(
           heroes: roundPick.commonPicks.toList(),
+          cardType: DeckChoiceCardType.display,
           scrollable: false,
           cardPerRow: cardsPerRow));
     }
@@ -375,6 +427,7 @@ class RoundResult extends StatelessWidget {
           textScaleFactor: scaleFactor, textAlign: TextAlign.center));
       children.add(HeroView(
           heroes: roundPick.followerPicks.toList(),
+          cardType: DeckChoiceCardType.display,
           scrollable: false,
           cardPerRow: cardsPerRow));
     }
@@ -382,7 +435,8 @@ class RoundResult extends StatelessWidget {
       children.add(Text("Follower had",
           textScaleFactor: scaleFactor, textAlign: TextAlign.center));
       children.add(HeroView(
-          heroes: followerPicks.difference(roundPick.leaderPicks).toList(),
+          heroes: followerPicks.difference(roundPick.followerPicks).toList(),
+          cardType: DeckChoiceCardType.display,
           scrollable: false,
           cardPerRow: cardsPerRow));
     }
@@ -397,6 +451,125 @@ class RoundResult extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: children,
+      ),
+    ));
+  }
+}
+
+class ArsenalAssignmentsBody extends StatelessWidget {
+  const ArsenalAssignmentsBody(
+      {super.key,
+      required this.myFighters,
+      required this.yourFighters,
+      required this.assignMyAdvantage,
+      required this.assignNeutral,
+      required this.assignYourAdvantage,
+      required this.yourAdvantage,
+      required this.myAdvantage,
+      required this.neutralPick});
+
+  final Set<String> myFighters;
+  final Set<String> yourFighters;
+  final void Function(String) assignMyAdvantage;
+  final void Function(String) assignNeutral;
+  final void Function(String) assignYourAdvantage;
+
+  final String? yourAdvantage;
+  final String? myAdvantage;
+  final String? neutralPick;
+
+  final double textScale = 1.3;
+
+  final int overviewCardsPerRow = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+        child: Column(
+      children: [
+        // Opponent's fighters
+        HeroView(
+            heroes: yourFighters.toList(),
+            cardType: DeckChoiceCardType.display,
+            scrollable: false,
+            cardPerRow: overviewCardsPerRow),
+        // Opponent's advantage
+        Text("Opponent's advantage", textScaleFactor: textScale),
+        AssignmentTarget(
+            selectedHero: yourAdvantage,
+            color: Colors.red,
+            onAccept: assignYourAdvantage),
+        // Neutral game
+        Text("Neutral game", textScaleFactor: textScale),
+        AssignmentTarget(
+            selectedHero: neutralPick,
+            color: Colors.yellow,
+            onAccept: assignNeutral),
+        // Your advantage
+        Text("Your advantage", textScaleFactor: textScale),
+        AssignmentTarget(
+            selectedHero: myAdvantage,
+            color: Colors.green,
+            onAccept: assignMyAdvantage),
+        // Your fighters
+        Text("Drag your fighters into positions", textScaleFactor: textScale),
+        HeroView(
+            heroes: myFighters.toList(),
+            cardType: DeckChoiceCardType.draggable,
+            scrollable: false,
+            cardPerRow: overviewCardsPerRow)
+      ],
+    ));
+  }
+}
+
+class AssignmentTarget extends StatelessWidget {
+  const AssignmentTarget({
+    Key? key,
+    required this.color,
+    required this.onAccept,
+    this.selectedHero,
+  }) : super(key: key);
+
+  final Color color;
+  final void Function(String) onAccept;
+
+  final double containerHeight = 120.0;
+
+  final String? selectedHero;
+
+  @override
+  Widget build(BuildContext context) {
+    return DragTarget<String>(
+        onAccept: onAccept,
+        builder: (context, candidateData, rejectedData) => Center(
+                child: Container(
+              height: containerHeight,
+              width: containerHeight / 1.5,
+              color: color,
+              child: selectedHero == null
+                  ? null
+                  : DeckChoiceCard(selectedHero!, DeckChoiceCardType.draggable,
+                      cardWidth: containerHeight / 1.5),
+            )));
+  }
+}
+
+class ArsenalAssignmentsBottomBar extends StatelessWidget {
+  const ArsenalAssignmentsBottomBar(this.goToNextState,
+      {required this.active, super.key, required this.leaderIsAssigning});
+
+  final bool active;
+  final bool leaderIsAssigning;
+  final VoidCallback goToNextState;
+
+  @override
+  Widget build(BuildContext context) {
+    return BottomAppBar(
+        child: TextButton(
+      onPressed: active ? goToNextState : null,
+      child: Text(
+        leaderIsAssigning ? "Go to follower's assignments" : "Go to results",
       ),
     ));
   }
@@ -424,6 +597,7 @@ class DraftResult extends StatelessWidget {
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(HeroView(
         heroes: leaderPicks.toList(),
+        cardType: DeckChoiceCardType.display,
         scrollable: false,
         cardPerRow: cardsPerRow));
 
@@ -431,6 +605,7 @@ class DraftResult extends StatelessWidget {
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(HeroView(
         heroes: followerPicks.toList(),
+        cardType: DeckChoiceCardType.display,
         scrollable: false,
         cardPerRow: cardsPerRow));
 
@@ -438,6 +613,7 @@ class DraftResult extends StatelessWidget {
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(HeroView(
         heroes: bannedCharacters.toList(),
+        cardType: DeckChoiceCardType.display,
         scrollable: false,
         cardPerRow: cardsPerRow));
 
