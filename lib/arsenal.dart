@@ -107,14 +107,14 @@ class ArsenalDraft {
     pool.removeWhere((element) => pick.leaderPicks.contains(element));
     pool.removeWhere((element) => pick.followerPicks.contains(element));
 
-    if (pool.isEmpty) {
-      pool.addAll(bannedCharacters);
-    }
-
     if (leaderChoice.length != followerChoice.length) {
       throw Exception("Somehow different amount of picks. "
           "Leader: ${leaderChoice.toString()}. "
           "Follower: ${followerChoice.toString()}");
+    }
+
+    if (pool.length < ARSENAL_SIZE - leaderChoice.length) {
+      pool.addAll(bannedCharacters);
     }
 
     leaderIsPicking = true;
@@ -231,12 +231,14 @@ class PositionPick {
       followerPick.isEmpty ? true : followerPick == fighter;
 
   void removeLeaderFighter(String fighter) {
+    print("Removing character '$fighter'. Current pick is $leaderPick");
     if (leaderPick == fighter) {
       leaderPick = "";
     }
   }
 
   void removeFollowerFighter(String fighter) {
+    print("Removing character '$fighter'. Current pick is '$followerPick'");
     if (followerPick == fighter) {
       followerPick = "";
     }
@@ -262,16 +264,6 @@ class ArsenalAssignments {
   bool get inited => leaderFighters.isNotEmpty && followerFighters.isNotEmpty;
 
   bool leaderIsAssigning = true;
-
-  bool _leaderFighterAvailable(String fighter) =>
-      leaderAdvantage.leaderFighterAvailable(fighter) &&
-      followerAdvantage.leaderFighterAvailable(fighter) &&
-      neutralGame.leaderFighterAvailable(fighter);
-
-  bool _followerFighterAvailable(String fighter) =>
-      leaderAdvantage.followerFighterAvailable(fighter) &&
-      followerAdvantage.followerFighterAvailable(fighter) &&
-      neutralGame.followerFighterAvailable(fighter);
 
   void initialize(Set<String> leaderPicks, Set<String> followerPicks) {
     leaderFighters = leaderPicks;
@@ -349,18 +341,14 @@ class ArsenalAssignments {
   }
 
   void _clearLeader(String fighter) {
-    if (!_leaderFighterAvailable(fighter)) {
-      leaderAdvantage.removeLeaderFighter(fighter);
-      followerAdvantage.removeLeaderFighter(fighter);
-      neutralGame.removeLeaderFighter(fighter);
-    }
+    leaderAdvantage.removeLeaderFighter(fighter);
+    followerAdvantage.removeLeaderFighter(fighter);
+    neutralGame.removeLeaderFighter(fighter);
   }
 
   void _clearFollower(String fighter) {
-    if (!_followerFighterAvailable(fighter)) {
-      leaderAdvantage.removeFollowerFighter(fighter);
-      followerAdvantage.removeFollowerFighter(fighter);
-      neutralGame.removeFollowerFighter(fighter);
-    }
+    leaderAdvantage.removeFollowerFighter(fighter);
+    followerAdvantage.removeFollowerFighter(fighter);
+    neutralGame.removeFollowerFighter(fighter);
   }
 }

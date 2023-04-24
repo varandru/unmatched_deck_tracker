@@ -1,11 +1,11 @@
 {
-    "name": "unmatched_deck_tracker",
-    "short_name": "unmatched_deck_tracker",
+    "name": "Unmatched Deck Tracker",
+    "short_name": "Tracker",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#000000",
     "theme_color": "#000000",
-    "description": "A new Flutter project.",
+    "description": "Unmatched deck tracker.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
