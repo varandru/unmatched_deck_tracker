@@ -80,6 +80,12 @@ class ArsenalDraft {
     }
   }
 
+  List<String> get myCharacters =>
+      leaderIsPicking ? leaderChoice.toList() : followerChoice.toList();
+
+  List<String> get opponentCharacters =>
+      leaderIsPicking ? followerChoice.toList() : leaderChoice.toList();
+
   bool get draftEnded => leaderChoice.length == ARSENAL_SIZE;
 
   void nextRound() {

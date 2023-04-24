@@ -71,7 +71,7 @@ class _DeckListViewState extends State<DeckListView>
             return ListTile(
               title: Text(
                 "Revealed cards count = ${deckInfo.hand.count}",
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
             );
@@ -79,14 +79,14 @@ class _DeckListViewState extends State<DeckListView>
             return ListTile(
               title: Text(
                 "Deck count = ${deckInfo.deck.count}/${deckInfo.totalCardCount}",
-                style: Theme.of(context).textTheme.headline6,
+                style: Theme.of(context).textTheme.titleLarge,
                 textAlign: TextAlign.center,
               ),
             );
           case TileType.discardHeader:
             return Text(
               "Discard pile has ${deckInfo.discard.count} cards.",
-              style: Theme.of(context).textTheme.headline6,
+              style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             );
           case TileType.handCard:

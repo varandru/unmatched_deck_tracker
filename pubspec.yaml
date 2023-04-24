@@ -102,6 +102,7 @@ flutter:
 
     - unmatched_deck_tracker_assets/images/type_markers/
     - unmatched_deck_tracker_assets/images/cardbacks/
+    - unmatched_deck_tracker_assets/images/logo.jpg
     - unmatched_deck_tracker_assets/other/sets.json
 
   # An image asset can refer to one or more resolution-specific "variants", see

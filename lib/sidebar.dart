@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/image_handling.dart';
 
 enum SidebarPosition { deckChoice, arsenal }
 
@@ -15,7 +16,14 @@ class Sidebar extends StatelessWidget {
     return Drawer(
         child: ListView(
       children: [
-        const DrawerHeader(child: Text("Menu")),
+        DrawerHeader(
+            child: Container(
+                decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            image: getLogo(),
+          ),
+        ))),
         ListTile(
           title: const Text("Decks choice"),
           selected: position == SidebarPosition.deckChoice,

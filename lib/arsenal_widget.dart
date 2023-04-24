@@ -138,13 +138,16 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
         );
         break;
       case CurrentArsenalState.draftResult:
-        body = DraftResult(
+        return DraftResult(
           leaderPicks: _draft.leaderChoice,
           followerPicks: _draft.followerChoice,
           bannedCharacters: _draft.bannedCharacters,
+          leaderAdvantage: _assignments.leaderAdvantage,
+          followerAdvantage: _assignments.followerAdvantage,
+          neutralGame: _assignments.neutralGame,
+          history: _draft.roundHistory,
+          goToNextStep: _goToNextState,
         );
-        bottomNavigationBar = DraftResultBottomBar(_goToNextState);
-        break;
       case CurrentArsenalState.leaderIsAssigning:
       case CurrentArsenalState.followerIsAssigning:
         body = ArsenalAssignmentsBody(
@@ -222,13 +225,53 @@ class PickView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return HeroView(
+    List<Widget> children = [];
+
+    double width = getEvenlySpacedWidth(context, 3);
+
+    if (draft.myCharacters.isNotEmpty) {
+      children.add(Row(children: [
+        SizedBox(
+            width: width, child: const Center(child: Text("Your fighters"))),
+        SizedBox(
+            width: width,
+            child: HeroView(
+                heroes: draft.myCharacters,
+                scrollable: false,
+                cardType: DeckChoiceCardType.display,
+                cardPerRow: 10)),
+        SizedBox(width: width),
+      ]));
+    }
+
+    if (draft.opponentCharacters.isNotEmpty) {
+      children.add(Row(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          SizedBox(width: width),
+          SizedBox(
+              width: width,
+              child: HeroView(
+                  heroes: draft.opponentCharacters,
+                  scrollable: false,
+                  cardType: DeckChoiceCardType.display,
+                  cardPerRow: 10)),
+          SizedBox(
+              width: width,
+              child: const Center(child: Text("Opponent's fighters"))),
+        ],
+      ));
+    }
+
+    children.add(HeroView(
       heroes: draft.pool,
       cardType: DeckChoiceCardType.selectable,
       scrollable: true,
       currentPicks: draft.currentPicks,
       clickedCharacter: clickedCharacter,
-    );
+    ));
+
+    return ListView(children: children);
   }
 }
 
@@ -255,8 +298,8 @@ class HeroView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width - 4.0;
-    final cardWidth = screenWidth / cardPerRow - spacing;
+    double cardWidth =
+        getEvenlySpacedWidth(context, cardPerRow, spacing: spacing);
 
     List<Widget> cardbacks = [];
     for (var heroName in heroes) {
@@ -291,6 +334,12 @@ class HeroView extends StatelessWidget {
       ),
     );
   }
+}
+
+double getEvenlySpacedWidth(BuildContext context, int cardPerRow,
+    {double spacing = 4.0}) {
+  final screenWidth = MediaQuery.of(context).size.width - spacing;
+  return screenWidth / cardPerRow - spacing;
 }
 
 enum DeckChoiceCardType { display, selectable, draggable }
@@ -329,7 +378,8 @@ class DeckChoiceCard extends StatelessWidget {
       child: cardType == DeckChoiceCardType.selectable
           ? Center(
               child: _isSelected
-                  ? const Icon(Icons.check_circle, size: 50.0)
+                  ? const Icon(Icons.check_circle,
+                      size: 50.0, color: Colors.white)
                   : null)
           : null,
     );
@@ -387,6 +437,7 @@ class RoundResult extends StatelessWidget {
   final RoundPick roundPick;
   final Set<String> leaderPicks;
   final Set<String> followerPicks;
+
   final VoidCallback toContinue;
 
   final double scaleFactor = 1.2;
@@ -581,19 +632,148 @@ class DraftResult extends StatelessWidget {
     required this.leaderPicks,
     required this.followerPicks,
     required this.bannedCharacters,
+    required this.leaderAdvantage,
+    required this.followerAdvantage,
+    required this.neutralGame,
+    required this.history,
+    required this.goToNextStep,
   });
 
   final Set<String> leaderPicks;
   final Set<String> followerPicks;
   final Set<String> bannedCharacters;
 
+  final PositionPick leaderAdvantage;
+  final PositionPick followerAdvantage;
+  final PositionPick neutralGame;
+
+  final List<RoundPick> history;
+  final VoidCallback goToNextStep;
+
   final double scaleFactor = 1.2;
   final int cardsPerRow = 6;
 
   @override
   Widget build(BuildContext context) {
+    return DefaultTabController(
+        length: 3,
+        child: Scaffold(
+          drawer: const Sidebar(SidebarPosition.arsenal,
+              openDeckChoice: goToDeckChoice, openArsenal: goToArsenal),
+          appBar: AppBar(
+              title: const Text("Draft Results"),
+              bottom: const TabBar(tabs: [
+                Tab(text: "Assignments"),
+                Tab(text: "Overview"),
+                Tab(text: "History"),
+              ])),
+          body: TabBarView(children: [
+            _createAssignmentsView(context),
+            _createHeroOverview(),
+            _createHistoryView(context),
+          ]),
+          bottomNavigationBar: DraftResultBottomBar(goToNextStep),
+        ));
+  }
+
+  Widget _createHistoryView(BuildContext context) {
+    int maxLeaderPicks = 0;
+    int maxCommonPicks = 0;
+    int maxFollowerPicks = 0;
+
+    for (var pick in history) {
+      if (pick.leaderPicks.length > maxLeaderPicks) {
+        maxLeaderPicks = pick.leaderPicks.length;
+      }
+      if (pick.commonPicks.length > maxCommonPicks) {
+        maxCommonPicks = pick.commonPicks.length;
+      }
+      if (pick.followerPicks.length > maxFollowerPicks) {
+        maxFollowerPicks = pick.followerPicks.length;
+      }
+    }
+
+    int cardsPerRow = maxLeaderPicks + maxCommonPicks + maxFollowerPicks + 3;
+    double cardWidth = getEvenlySpacedWidth(context, cardsPerRow);
+    double cardHeight = cardWidth * 1.5;
+
+    return SizedBox(
+      width: double.infinity,
+      child: DataTable(
+        horizontalMargin: 4.0,
+        columnSpacing: 0.0,
+        dataRowHeight: cardHeight + 8.0,
+        border: TableBorder.symmetric(inside: const BorderSide()),
+        columns: const [
+          DataColumn(label: Expanded(child: Center(child: Text("Leader")))),
+          DataColumn(label: Expanded(child: Center(child: Text("Banned")))),
+          DataColumn(label: Expanded(child: Center(child: Text("Follower")))),
+        ],
+        rows: List<DataRow>.generate(
+          history.length,
+          (index) => DataRow(
+            cells: [
+              DataCell(Center(
+                  child: HeroView(
+                      heroes: history[index].leaderPicks.toList(),
+                      scrollable: false,
+                      cardType: DeckChoiceCardType.display,
+                      cardPerRow: cardsPerRow))),
+              DataCell(Center(
+                  child: HeroView(
+                      heroes: history[index].commonPicks.toList(),
+                      scrollable: false,
+                      cardType: DeckChoiceCardType.display,
+                      cardPerRow: cardsPerRow))),
+              DataCell(Center(
+                  child: HeroView(
+                      heroes: history[index].followerPicks.toList(),
+                      scrollable: false,
+                      cardType: DeckChoiceCardType.display,
+                      cardPerRow: cardsPerRow))),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _createAssignmentsView(BuildContext context) {
     List<Widget> children = [];
-    children.add(Text("Leader has",
+    children.add(_createAssignmentsHeader(context));
+    children.add(Text("Leader advanatage: ",
+        textScaleFactor: scaleFactor, textAlign: TextAlign.center));
+    children.add(MatchWidget(leaderAdvantage));
+    children.add(Text("Follower advanatage: ",
+        textScaleFactor: scaleFactor, textAlign: TextAlign.center));
+    children.add(MatchWidget(followerAdvantage));
+    children.add(Text("Neutral game: ",
+        textScaleFactor: scaleFactor, textAlign: TextAlign.center));
+    children.add(MatchWidget(neutralGame));
+    return Center(child: ListView(shrinkWrap: true, children: children));
+  }
+
+  Widget _createAssignmentsHeader(BuildContext context) {
+    double width = getEvenlySpacedWidth(context, 4);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        SizedBox(
+            width: width,
+            child: const Text("Leader",
+                textScaleFactor: 1.3, textAlign: TextAlign.center)),
+        SizedBox(width: width),
+        SizedBox(
+            width: width,
+            child: const Text("Follower",
+                textScaleFactor: 1.3, textAlign: TextAlign.center)),
+      ],
+    );
+  }
+
+  Widget _createHeroOverview() {
+    List<Widget> children = [];
+    children.add(Text("Leader's fighters are:",
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(HeroView(
         heroes: leaderPicks.toList(),
@@ -601,7 +781,7 @@ class DraftResult extends StatelessWidget {
         scrollable: false,
         cardPerRow: cardsPerRow));
 
-    children.add(Text("Follower has",
+    children.add(Text("Follower's fighters are:",
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(HeroView(
         heroes: followerPicks.toList(),
@@ -609,22 +789,40 @@ class DraftResult extends StatelessWidget {
         scrollable: false,
         cardPerRow: cardsPerRow));
 
-    children.add(Text("These heroes don't get to play this time",
-        textScaleFactor: scaleFactor, textAlign: TextAlign.center));
-    children.add(HeroView(
-        heroes: bannedCharacters.toList(),
-        cardType: DeckChoiceCardType.display,
-        scrollable: false,
-        cardPerRow: cardsPerRow));
+    if (bannedCharacters.isNotEmpty) {
+      children.add(Text("These heroes don't get to play this time",
+          textScaleFactor: scaleFactor, textAlign: TextAlign.center));
+      children.add(HeroView(
+          heroes: bannedCharacters.toList(),
+          cardType: DeckChoiceCardType.display,
+          scrollable: false,
+          cardPerRow: cardsPerRow));
+    }
+    return Center(child: ListView(shrinkWrap: true, children: children));
+  }
+}
 
-    return Center(
-        child: SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: children,
-      ),
-    ));
+class MatchWidget extends StatelessWidget {
+  const MatchWidget(this.positionPick, {super.key});
+
+  final PositionPick positionPick;
+  final int cardsPerRow = 4;
+
+  @override
+  Widget build(BuildContext context) {
+    double width = getEvenlySpacedWidth(context, cardsPerRow);
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        DeckChoiceCard(positionPick.leaderPick, DeckChoiceCardType.display,
+            cardWidth: width),
+        SizedBox(
+            width: width,
+            child: const Center(child: Text("VS", textScaleFactor: 4.0))),
+        DeckChoiceCard(positionPick.followerPick, DeckChoiceCardType.display,
+            cardWidth: width),
+      ],
+    );
   }
 }
 

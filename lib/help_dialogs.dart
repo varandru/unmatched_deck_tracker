@@ -109,7 +109,7 @@ class MainMenuHelpDialog extends StatelessWidget {
             legalDisclaimer,
             Text(
               "Help",
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             oneOrTwoPlayerHelp,
           ],
@@ -137,7 +137,7 @@ class DeckViewHelpDialog extends StatelessWidget {
             legalDisclaimer,
             Text(
               "Help",
-              style: Theme.of(context).textTheme.headline5,
+              style: Theme.of(context).textTheme.headlineSmall,
             ),
             deckViewHelp,
             tapOnCardText,
