@@ -9,12 +9,18 @@ import 'image_handling.dart';
 
 void goToArsenal(BuildContext context) {
   Navigator.of(context).pushReplacement(
-    MaterialPageRoute(builder: (context) => const ArsenalBaseWidget()),
+    MaterialPageRoute(builder: (context) => const ArsenalSettings()),
   );
 }
 
 class ArsenalBaseWidget extends StatefulWidget {
-  const ArsenalBaseWidget({super.key});
+  const ArsenalBaseWidget(
+      {super.key,
+      required this.hasNeutralGame,
+      required this.bannedCharacters});
+
+  final bool hasNeutralGame;
+  final Set<String> bannedCharacters;
 
   @override
   State<ArsenalBaseWidget> createState() => _ArsenalBaseWidgetState();
@@ -45,7 +51,8 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
               ? CurrentArsenalState.leaderIsAssigning
               : CurrentArsenalState.leaderIsPicking;
           if (_draft.draftEnded) {
-            _assignments.initialize(_draft.leaderChoice, _draft.followerChoice);
+            _assignments.initialize(_draft.leaderChoice, _draft.followerChoice,
+                widget.hasNeutralGame);
           }
           break;
         case CurrentArsenalState.draftResult:
@@ -89,6 +96,8 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
     getDecksFromAssets().then((value) {
       setState(() {
         _decks = value;
+        _decks.removeWhere(
+            (element) => widget.bannedCharacters.contains(element.name));
         _draft.reset(value);
         _loaded = true;
       });
@@ -147,7 +156,7 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
           followerAdvantage: _assignments.followerAdvantage,
           neutralGame: _assignments.neutralGame,
           history: _draft.roundHistory,
-          goToNextStep: _goToNextState,
+          hasNeutralGame: widget.hasNeutralGame,
         );
       case CurrentArsenalState.leaderIsAssigning:
       case CurrentArsenalState.followerIsAssigning:
@@ -163,6 +172,7 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
           yourAdvantage: _assignments.yourAdvantage,
           myAdvantage: _assignments.myAdvantage,
           neutralPick: _assignments.neutralPick,
+          hasNeutralGame: widget.hasNeutralGame,
         );
         print("Filled? ${_assignments.filled}");
         bottomNavigationBar = ArsenalAssignmentsBottomBar(_goToNextState,
@@ -527,10 +537,12 @@ class ArsenalAssignmentsBody extends StatelessWidget {
       required this.assignYourAdvantage,
       required this.yourAdvantage,
       required this.myAdvantage,
-      required this.neutralPick});
+      required this.neutralPick,
+      required this.hasNeutralGame});
 
   final Set<String> myFighters;
   final Set<String> yourFighters;
+  final bool hasNeutralGame;
   final void Function(String) assignMyAdvantage;
   final void Function(String) assignNeutral;
   final void Function(String) assignYourAdvantage;
@@ -545,41 +557,54 @@ class ArsenalAssignmentsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-        child: Column(
-      children: [
-        // Opponent's fighters
-        HeroView(
-            heroes: yourFighters.toList(),
-            cardType: DeckChoiceCardType.display,
-            scrollable: false,
-            cardPerRow: overviewCardsPerRow),
-        // Opponent's advantage
-        Text("Opponent's advantage", textScaleFactor: textScale),
-        AssignmentTarget(
-            selectedHero: yourAdvantage,
-            color: Colors.red,
-            onAccept: assignYourAdvantage),
+    List<Widget> children = [];
+
+    children.addAll([
+      // Opponent's fighters
+      HeroView(
+          heroes: yourFighters.toList(),
+          cardType: DeckChoiceCardType.display,
+          scrollable: false,
+          cardPerRow: overviewCardsPerRow),
+      // Opponent's advantage
+      Text("Opponent's advantage", textScaleFactor: textScale),
+      AssignmentTarget(
+          selectedHero: yourAdvantage,
+          color: Colors.red,
+          onAccept: assignYourAdvantage),
+    ]);
+
+    if (hasNeutralGame) {
+      children.addAll([
         // Neutral game
         Text("Neutral game", textScaleFactor: textScale),
         AssignmentTarget(
             selectedHero: neutralPick,
             color: Colors.yellow,
             onAccept: assignNeutral),
-        // Your advantage
-        Text("Your advantage", textScaleFactor: textScale),
-        AssignmentTarget(
-            selectedHero: myAdvantage,
-            color: Colors.green,
-            onAccept: assignMyAdvantage),
-        // Your fighters
-        Text("Drag your fighters into positions", textScaleFactor: textScale),
-        HeroView(
-            heroes: myFighters.toList(),
-            cardType: DeckChoiceCardType.draggable,
-            scrollable: false,
-            cardPerRow: overviewCardsPerRow)
-      ],
+      ]);
+    }
+
+    children.addAll([
+      // Your advantage
+      Text("Your advantage", textScaleFactor: textScale),
+      AssignmentTarget(
+          selectedHero: myAdvantage,
+          color: Colors.green,
+          onAccept: assignMyAdvantage),
+      // Your fighters
+      Text("Drag your fighters into positions", textScaleFactor: textScale),
+      HeroView(
+          heroes: myFighters.toList(),
+          cardType: DeckChoiceCardType.draggable,
+          scrollable: false,
+          cardPerRow: overviewCardsPerRow)
+    ]);
+
+    return Center(
+        child: ListView(
+      shrinkWrap: true,
+      children: children,
     ));
   }
 }
@@ -646,7 +671,7 @@ class DraftResult extends StatelessWidget {
     required this.followerAdvantage,
     required this.neutralGame,
     required this.history,
-    required this.goToNextStep,
+    required this.hasNeutralGame,
   });
 
   final Set<String> leaderPicks;
@@ -655,10 +680,10 @@ class DraftResult extends StatelessWidget {
 
   final PositionPick leaderAdvantage;
   final PositionPick followerAdvantage;
+  final bool hasNeutralGame;
   final PositionPick neutralGame;
 
   final List<RoundPick> history;
-  final VoidCallback goToNextStep;
 
   final double scaleFactor = 1.2;
   final int cardsPerRow = 6;
@@ -678,11 +703,11 @@ class DraftResult extends StatelessWidget {
                 Tab(text: "History"),
               ])),
           body: TabBarView(children: [
-            _createAssignmentsView(context),
+            _createAssignmentsView(context, hasNeutralGame),
             _createHeroOverview(),
             _createHistoryView(context),
           ]),
-          bottomNavigationBar: DraftResultBottomBar(goToNextStep),
+          bottomNavigationBar: const DraftResultBottomBar(),
         ));
   }
 
@@ -749,7 +774,7 @@ class DraftResult extends StatelessWidget {
     ));
   }
 
-  Widget _createAssignmentsView(BuildContext context) {
+  Widget _createAssignmentsView(BuildContext context, bool hasNeutralGame) {
     List<Widget> children = [];
     children.add(_createAssignmentsHeader(context));
     children.add(Text("Leader advanatage: ",
@@ -758,9 +783,11 @@ class DraftResult extends StatelessWidget {
     children.add(Text("Follower advanatage: ",
         textScaleFactor: scaleFactor, textAlign: TextAlign.center));
     children.add(MatchWidget(followerAdvantage));
-    children.add(Text("Neutral game: ",
-        textScaleFactor: scaleFactor, textAlign: TextAlign.center));
-    children.add(MatchWidget(neutralGame));
+    if (hasNeutralGame) {
+      children.add(Text("Neutral game: ",
+          textScaleFactor: scaleFactor, textAlign: TextAlign.center));
+      children.add(MatchWidget(neutralGame));
+    }
     return Center(child: ListView(shrinkWrap: true, children: children));
   }
 
@@ -838,16 +865,112 @@ class MatchWidget extends StatelessWidget {
 }
 
 class DraftResultBottomBar extends StatelessWidget {
-  const DraftResultBottomBar(this._goToNextStep, {super.key});
-
-  final VoidCallback _goToNextStep;
-
+  const DraftResultBottomBar({super.key});
   @override
   Widget build(BuildContext context) {
     return BottomAppBar(
         child: TextButton(
-      onPressed: _goToNextStep,
+      onPressed: () {
+        goToArsenal(context);
+      },
       child: const Text("Restart?"),
     ));
+  }
+}
+
+class ArsenalSettings extends StatefulWidget {
+  const ArsenalSettings({super.key});
+
+  @override
+  State<ArsenalSettings> createState() => _ArsenalSettingsState();
+}
+
+class _ArsenalSettingsState extends State<ArsenalSettings> {
+  bool hasNeutralGame = true;
+  bool isExpanded = false;
+  Set<String> bannedCharacters = Set.identity();
+
+  @override
+  void initState() {
+    bannedCharacters.add('Deadpool');
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: getDecksFromAssets(),
+        builder: ((context, snapshot) {
+          if (snapshot.hasError) {
+            return ErrorWidget(snapshot.error!);
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          List<ShortDeck> decks = snapshot.data!;
+
+          return Scaffold(
+            appBar: AppBar(title: const Text("Arsenal Setup")),
+            drawer: const Sidebar(SidebarPosition.arsenal,
+                openDeckChoice: goToDeckChoice, openArsenal: goToArsenal),
+            // bottomNavigationBar: bottomNavigationBar,
+            body: ListView(
+              children: [
+                SwitchListTile(
+                    value: hasNeutralGame,
+                    title: const Text("Has neutral game"),
+                    subtitle: const Text("Configures whether a third game"
+                        " with split advantage is set up"),
+                    onChanged: ((value) {
+                      setState(() {
+                        hasNeutralGame = value;
+                      });
+                    })),
+                ExpansionTile(
+                  title: isExpanded
+                      ? const Text("Banned characters")
+                      : const Text("Checked characters will be banned"),
+                  initiallyExpanded: isExpanded,
+                  onExpansionChanged: (value) => setState(() {
+                    isExpanded = value;
+                  }),
+                  children: [
+                    ListView.builder(
+                        itemCount: decks.length,
+                        shrinkWrap: true,
+                        itemBuilder: ((context, index) => CheckboxListTile(
+                            title: Text(decks[index].name),
+                            value: bannedCharacters.contains(decks[index].name),
+                            onChanged: ((value) {
+                              if (value == null) {
+                                return;
+                              }
+
+                              setState(() {
+                                if (value) {
+                                  bannedCharacters.add(decks[index].name);
+                                } else {
+                                  bannedCharacters.remove(decks[index].name);
+                                }
+                              });
+                            }))))
+                  ],
+                )
+              ],
+            ),
+            bottomNavigationBar: BottomAppBar(
+                child: TextButton(
+              onPressed: () {
+                Navigator.of(context).pushReplacement(MaterialPageRoute(
+                    builder: ((context) => ArsenalBaseWidget(
+                        hasNeutralGame: hasNeutralGame,
+                        bannedCharacters: bannedCharacters))));
+              },
+              child: const Text("Play Arsenal"),
+            )),
+          );
+        }));
   }
 }

@@ -99,6 +99,9 @@ flutter:
     - unmatched_deck_tracker_assets/characters/Yennenga.json
     - unmatched_deck_tracker_assets/characters/Houdini.json
     - unmatched_deck_tracker_assets/characters/The Genie.json
+    - unmatched_deck_tracker_assets/characters/Ms. Marvel.json
+    - unmatched_deck_tracker_assets/characters/Squirrel Girl.json
+    - unmatched_deck_tracker_assets/characters/Cloak.json
 
     - unmatched_deck_tracker_assets/images/type_markers/
     - unmatched_deck_tracker_assets/images/cardbacks/

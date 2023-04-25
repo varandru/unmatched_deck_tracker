@@ -289,6 +289,7 @@ class PositionPick {
 class ArsenalAssignments {
   ArsenalAssignments();
 
+  bool hasNeutralGame = true;
   PositionPick leaderAdvantage =
       PositionPick(ArsenalAssignment.leaderAdvantage);
   PositionPick followerAdvantage =
@@ -302,9 +303,11 @@ class ArsenalAssignments {
 
   bool leaderIsAssigning = true;
 
-  void initialize(Set<String> leaderPicks, Set<String> followerPicks) {
+  void initialize(
+      Set<String> leaderPicks, Set<String> followerPicks, bool hasNeutralGame) {
     leaderFighters = leaderPicks;
     followerFighters = followerPicks;
+    this.hasNeutralGame = hasNeutralGame;
     print('Leader has $leaderFighters');
     print('Follower has $followerFighters');
   }
@@ -342,7 +345,7 @@ class ArsenalAssignments {
   bool get filled =>
       leaderAdvantage.filled(leaderIsAssigning) &&
       followerAdvantage.filled(leaderIsAssigning) &&
-      neutralGame.filled(leaderIsAssigning);
+      (hasNeutralGame ? neutralGame.filled(leaderIsAssigning) : true);
 
   Set<String> get myFighters =>
       leaderIsAssigning ? leaderFighters : followerFighters;
