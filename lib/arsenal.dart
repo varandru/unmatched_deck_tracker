@@ -126,6 +126,12 @@ class ArsenalDraft {
         : _confirmSelectionFollower();
   }
 
+  bool checkSelection() {
+    return leaderIsPicking
+        ? _checkSelectionLeader()
+        : _checkSelectionFollower();
+  }
+
   bool _confirmSelectionLeader() {
     if (currentPicks.length + leaderChoice.length != ARSENAL_SIZE) {
       print("Select the neccessary fighters");
@@ -161,6 +167,35 @@ class ArsenalDraft {
     return true;
   }
 
+  bool _checkSelectionLeader() {
+    if (currentPicks.length + leaderChoice.length != ARSENAL_SIZE) {
+      print("Select the neccessary fighters");
+      return false;
+    }
+
+    if (currentPicks.intersection(leaderChoice).isNotEmpty) {
+      print("How the fuck? Combined fighters are"
+          " ${currentPicks.intersection(leaderChoice).toString()}");
+    }
+
+    return true;
+  }
+
+  bool _checkSelectionFollower() {
+    if (currentPicks.length + followerChoice.length != ARSENAL_SIZE) {
+      print("Select the neccessary fighters");
+      return false;
+    }
+
+    if (currentPicks.intersection(followerChoice).isNotEmpty) {
+      print("How the fuck? Combined fighters are"
+          " ${currentPicks.intersection(followerChoice).toString()}");
+      return false;
+    }
+
+    return true;
+  }
+
   int get picksLeft {
     if (leaderIsPicking) {
       return ARSENAL_SIZE - leaderChoice.length;
@@ -170,6 +205,8 @@ class ArsenalDraft {
   }
 
   Set<String> get picks => leaderIsPicking ? leaderChoice : followerChoice;
+  Set<String> get hiddenPicks =>
+      leaderIsPicking ? leaderHiddenPicks : followerHiddenPicks;
 }
 
 enum ArsenalAssignment {

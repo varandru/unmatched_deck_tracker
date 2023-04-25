@@ -57,6 +57,14 @@ const Text expandCollapseText = Text.rich(TextSpan(children: <InlineSpan>[
 const Text leavingDeckView = Text("You are leaving deck view. "
     "If you do, all tracking progress will be lost. Are you sure?");
 
+const Text confirmingChoiceView =
+    Text("Are you sure in your selection? Once you click \"Yes\", "
+        "there's no going back.");
+
+Text getFighterList(Set<String> fighters) {
+  return Text("Your selection is $fighters");
+}
+
 class BackingOutOfDeckDialog extends StatelessWidget {
   const BackingOutOfDeckDialog({super.key});
 
@@ -65,6 +73,34 @@ class BackingOutOfDeckDialog extends StatelessWidget {
     return AlertDialog(
       title: const Text("Exiting deck view"),
       content: leavingDeckView,
+      actions: [
+        TextButton(
+            onPressed: (() => Navigator.of(context).pop(true)),
+            child: const Text("Yes")),
+        TextButton(
+            onPressed: (() => Navigator.of(context).pop(false)),
+            child: const Text("No")),
+      ],
+    );
+  }
+}
+
+class ConfirmingChoiceDialog extends StatelessWidget {
+  const ConfirmingChoiceDialog(this.fighters, {super.key});
+
+  final Set<String> fighters;
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text("Confirm?"),
+      content: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            confirmingChoiceView,
+            getFighterList(fighters),
+          ]),
       actions: [
         TextButton(
             onPressed: (() => Navigator.of(context).pop(true)),

@@ -28,21 +28,17 @@ class _SetWidgetState extends State<SetWidget> {
         title: Text(widget.set.name),
         key: widget.key,
         initiallyExpanded: true,
-        children: [
-          ListView.builder(
-              itemCount: widget.set.characters.length,
-              shrinkWrap: true,
-              primary: false,
-              itemBuilder: ((context, index) => DeckListTile(
-                    widget.set.characters[index],
-                    index: index,
-                    deckGetter: widget.deckGetter,
-                    previousChoice: () => widget.previousChoice,
-                    isTwoPlayerMode: widget.isTwoPlayerMode,
-                    isChosen: widget.previousChoice != null
-                        ? widget.set.characters[index] == widget.previousChoice!
-                        : false,
-                  )))
-        ],
+        children: List<Widget>.generate(
+            widget.set.characters.length,
+            (index) => DeckListTile(
+                  widget.set.characters[index],
+                  index: index,
+                  deckGetter: widget.deckGetter,
+                  previousChoice: () => widget.previousChoice,
+                  isTwoPlayerMode: widget.isTwoPlayerMode,
+                  isChosen: widget.previousChoice != null
+                      ? widget.set.characters[index] == widget.previousChoice!
+                      : false,
+                )),
       );
 }

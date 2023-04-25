@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/arsenal.dart';
 import 'package:unmatched_deck_tracker/deck.dart';
+import 'package:unmatched_deck_tracker/help_dialogs.dart';
 import 'package:unmatched_deck_tracker/sidebar.dart';
 
 import 'deck_choice_widget.dart' show goToDeckChoice;
@@ -204,9 +205,18 @@ class HeroBottomBar extends StatelessWidget {
         ),
         TextButton(
           onPressed: picksMatch
-              ? () {
-                  if (_draft.confirmSelection()) {
-                    _goToNextStep();
+              ? () async {
+                  if (_draft.checkSelection()) {
+                    showDialog<bool>(
+                            context: context,
+                            builder: (context) =>
+                                ConfirmingChoiceDialog(_draft.currentPicks))
+                        .then((value) {
+                      if (value ?? false) {
+                        _draft.confirmSelection();
+                        _goToNextStep();
+                      }
+                    });
                   }
                 }
               : null,
@@ -697,7 +707,8 @@ class DraftResult extends StatelessWidget {
     double cardWidth = getEvenlySpacedWidth(context, cardsPerRow);
     double cardHeight = cardWidth * 1.5;
 
-    return SizedBox(
+    return Center(
+        child: SizedBox(
       width: double.infinity,
       child: DataTable(
         horizontalMargin: 4.0,
@@ -735,7 +746,7 @@ class DraftResult extends StatelessWidget {
           ),
         ),
       ),
-    );
+    ));
   }
 
   Widget _createAssignmentsView(BuildContext context) {
