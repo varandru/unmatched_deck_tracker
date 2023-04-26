@@ -4,6 +4,7 @@ import 'package:unmatched_deck_tracker/deck.dart';
 import 'package:unmatched_deck_tracker/help_dialogs.dart';
 import 'package:unmatched_deck_tracker/sidebar.dart';
 
+import 'common_defs.dart';
 import 'deck_choice_widget.dart' show goToDeckChoice;
 import 'image_handling.dart';
 
@@ -133,7 +134,14 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
                   _draft.pool.shuffle();
                 });
               },
-              icon: const Icon(Icons.casino))
+              icon: const Icon(Icons.casino)),
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) => const ArsenalPickViewHelpDialog());
+              },
+              icon: helpIcon)
         ];
         break;
       case CurrentArsenalState.leaderPassesPhone:
@@ -174,10 +182,19 @@ class _ArsenalBaseWidgetState extends State<ArsenalBaseWidget> {
           neutralPick: _assignments.neutralPick,
           hasNeutralGame: widget.hasNeutralGame,
         );
-        print("Filled? ${_assignments.filled}");
         bottomNavigationBar = ArsenalAssignmentsBottomBar(_goToNextState,
             active: _assignments.filled,
             leaderIsAssigning: _assignments.leaderIsAssigning);
+        actions = [
+          IconButton(
+              onPressed: () {
+                showDialog(
+                    context: context,
+                    builder: (context) =>
+                        const ArsenalAssignmentViewHelpDialog());
+              },
+              icon: helpIcon)
+        ];
         break;
     }
 

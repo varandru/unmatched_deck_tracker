@@ -1,6 +1,8 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:unmatched_deck_tracker/common_defs.dart';
 import 'package:unmatched_deck_tracker/settings.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 const Text legalDisclaimer = Text(
     "This app is not published by or affiliated with Restoration Games."
@@ -60,6 +62,28 @@ const Text leavingDeckView = Text("You are leaving deck view. "
 const Text confirmingChoiceView =
     Text("Are you sure in your selection? Once you click \"Yes\", "
         "there's no going back.");
+
+const Text arsenalPickHelp = Text("This is the hero picking view. "
+    "Click on the characters you're choosing for this round. Chosen fighters "
+    "are marked with a checkmark, and the bottom bar shows how many characters"
+    " you have left to pick.");
+
+const Text arsenalAssignmentHelp = Text("This is the hero assignment view. "
+    "Drag the chosen heroes into their positions from the list at the bottom, "
+    "or from another position if you happen to change your mind. "
+    "Click the button at the bottom to continue when you're done. ");
+
+Text arsenalLink = Text.rich(
+    TextSpan(text: "See official rules for the Arsenal format ", children: [
+  TextSpan(
+    text: "here",
+    style: const TextStyle(
+        decoration: TextDecoration.underline, color: Colors.blue),
+    recognizer: TapGestureRecognizer()
+      ..onTap = () => launchUrl(Uri.parse(
+          'https://docs.google.com/document/d/1dNOztTCMpSiRhwNqNqla9xKMb5nqtPSfLuPDwHfYLjU')),
+  ),
+]));
 
 Text getFighterList(Set<String> fighters) {
   return Text("Your selection is $fighters");
@@ -143,6 +167,7 @@ class MainMenuHelpDialog extends StatelessWidget {
           shrinkWrap: true,
           children: [
             legalDisclaimer,
+            const SizedBox(height: 30.0),
             Text(
               "Help",
               style: Theme.of(context).textTheme.headlineSmall,
@@ -171,6 +196,7 @@ class DeckViewHelpDialog extends StatelessWidget {
           shrinkWrap: true,
           children: [
             legalDisclaimer,
+            const SizedBox(height: 30.0),
             Text(
               "Help",
               style: Theme.of(context).textTheme.headlineSmall,
@@ -179,6 +205,66 @@ class DeckViewHelpDialog extends StatelessWidget {
             tapOnCardText,
             moveCardButtonText,
             expandCollapseText,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ArsenalPickViewHelpDialog extends StatelessWidget {
+  const ArsenalPickViewHelpDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      actions: [
+        TextButton(
+            onPressed: (() => Navigator.pop(context)), child: const Text("OK")),
+      ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            legalDisclaimer,
+            const SizedBox(height: 30.0),
+            Text(
+              "Help",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            arsenalPickHelp,
+            arsenalLink,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class ArsenalAssignmentViewHelpDialog extends StatelessWidget {
+  const ArsenalAssignmentViewHelpDialog({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      actions: [
+        TextButton(
+            onPressed: (() => Navigator.pop(context)), child: const Text("OK")),
+      ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: ListView(
+          shrinkWrap: true,
+          children: [
+            legalDisclaimer,
+            const SizedBox(height: 30.0),
+            Text(
+              "Help",
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            arsenalAssignmentHelp,
+            arsenalLink,
           ],
         ),
       ),
