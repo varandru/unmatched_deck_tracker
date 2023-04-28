@@ -264,7 +264,7 @@ class PickView extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> children = [];
 
-    double width = getEvenlySpacedWidth(context, 3);
+    double width = getEvenlySpacedWidth(context, 3, CardSize.doNoClamp);
 
     if (draft.myCharacters.isNotEmpty) {
       children.add(Row(children: [
@@ -300,12 +300,15 @@ class PickView extends StatelessWidget {
       ));
     }
 
+    var isVertical = MediaQuery.of(context).orientation == Orientation.portrait;
+
     children.add(HeroView(
       heroes: draft.pool,
       cardType: DeckChoiceCardType.selectable,
       scrollable: true,
       currentPicks: draft.currentPicks,
       clickedCharacter: clickedCharacter,
+      cardPerRow: isVertical ? 4 : 6,
     ));
 
     return ListView(children: children);
@@ -335,8 +338,9 @@ class HeroView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double cardWidth =
-        getEvenlySpacedWidth(context, cardPerRow, spacing: spacing);
+    double cardWidth = getEvenlySpacedWidth(
+        context, cardPerRow, CardSize.medium,
+        spacing: spacing);
 
     List<Widget> cardbacks = [];
     for (var heroName in heroes) {
@@ -373,12 +377,6 @@ class HeroView extends StatelessWidget {
   }
 }
 
-double getEvenlySpacedWidth(BuildContext context, int cardPerRow,
-    {double spacing = 4.0}) {
-  final screenWidth = MediaQuery.of(context).size.width - spacing;
-  return screenWidth / cardPerRow - spacing;
-}
-
 enum DeckChoiceCardType { display, selectable, draggable }
 
 class DeckChoiceCard extends StatelessWidget {
@@ -402,6 +400,32 @@ class DeckChoiceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Widget stack;
+
+    Text cardName = cardWidth < 40.0
+        ? const Text("")
+        : Text(deckName,
+            softWrap: false,
+            style: const TextStyle(
+                backgroundColor: Colors.black,
+                color: Colors.white,
+                overflow: TextOverflow.fade));
+
+    if (cardType == DeckChoiceCardType.selectable) {
+      stack = Stack(
+        children: [
+          Center(
+              child: _isSelected
+                  ? const Icon(Icons.check_circle,
+                      size: 50.0, color: Colors.white)
+                  : null),
+          cardName,
+        ],
+      );
+    } else {
+      stack = cardName;
+    }
+
     var card = Container(
       alignment: Alignment.bottomCenter,
       height: cardWidth * heightFactor,
@@ -412,13 +436,7 @@ class DeckChoiceCard extends StatelessWidget {
           image: getCardbackByName(deckName),
         ),
       ),
-      child: cardType == DeckChoiceCardType.selectable
-          ? Center(
-              child: _isSelected
-                  ? const Icon(Icons.check_circle,
-                      size: 50.0, color: Colors.white)
-                  : null)
-          : null,
+      child: stack,
     );
 
     switch (cardType) {
@@ -568,7 +586,7 @@ class ArsenalAssignmentsBody extends StatelessWidget {
   final String? myAdvantage;
   final String? neutralPick;
 
-  final double textScale = 1.3;
+  final double textScale = 1.2;
 
   final int overviewCardsPerRow = 6;
 
@@ -576,41 +594,49 @@ class ArsenalAssignmentsBody extends StatelessWidget {
   Widget build(BuildContext context) {
     List<Widget> children = [];
 
-    children.addAll([
-      // Opponent's fighters
-      HeroView(
-          heroes: yourFighters.toList(),
-          cardType: DeckChoiceCardType.display,
-          scrollable: false,
-          cardPerRow: overviewCardsPerRow),
+    List<Widget> rowChildren = [];
+
+    children.add(
+        // Opponent's fighters
+        HeroView(
+            heroes: yourFighters.toList(),
+            cardType: DeckChoiceCardType.display,
+            scrollable: false,
+            cardPerRow: overviewCardsPerRow));
+    rowChildren.add(Column(children: [
       // Opponent's advantage
-      Text("Opponent's advantage", textScaleFactor: textScale),
+      Center(child: Text("Opponent's advantage", textScaleFactor: textScale)),
       AssignmentTarget(
           selectedHero: yourAdvantage,
           color: Colors.red,
           onAccept: assignYourAdvantage),
-    ]);
+    ]));
 
     if (hasNeutralGame) {
-      children.addAll([
+      rowChildren.add(Column(children: [
         // Neutral game
-        Text("Neutral game", textScaleFactor: textScale),
+        Center(child: Text("Neutral game", textScaleFactor: textScale)),
         AssignmentTarget(
             selectedHero: neutralPick,
             color: Colors.yellow,
             onAccept: assignNeutral),
-      ]);
+      ]));
     }
 
-    children.addAll([
+    rowChildren.add(Column(children: [
       // Your advantage
-      Text("Your advantage", textScaleFactor: textScale),
+      Center(child: Text("Your advantage", textScaleFactor: textScale)),
       AssignmentTarget(
           selectedHero: myAdvantage,
           color: Colors.green,
           onAccept: assignMyAdvantage),
+    ]));
+    children.addAll([
+      Row(children: rowChildren),
       // Your fighters
-      Text("Drag your fighters into positions", textScaleFactor: textScale),
+      Center(
+          child: Text("Drag your fighters into positions",
+              textScaleFactor: textScale)),
       HeroView(
           heroes: myFighters.toList(),
           cardType: DeckChoiceCardType.draggable,
@@ -637,23 +663,30 @@ class AssignmentTarget extends StatelessWidget {
   final Color color;
   final void Function(String) onAccept;
 
-  final double containerHeight = 120.0;
-
   final String? selectedHero;
 
   @override
   Widget build(BuildContext context) {
+    double containerWidth = getEvenlySpacedWidth(context, 6, CardSize.medium);
+    double containerHeight = getEvenlySpacedHeight(context, 5, CardSize.medium);
+
+    if (containerWidth * 1.5 < containerHeight) {
+      containerHeight = containerWidth * 1.5;
+    } else {
+      containerWidth = containerHeight / 1.5;
+    }
+
     return DragTarget<String>(
         onAccept: onAccept,
         builder: (context, candidateData, rejectedData) => Center(
                 child: Container(
               height: containerHeight,
-              width: containerHeight / 1.5,
+              width: containerWidth,
               color: color,
               child: selectedHero == null
                   ? null
                   : DeckChoiceCard(selectedHero!, DeckChoiceCardType.draggable,
-                      cardWidth: containerHeight / 1.5),
+                      cardWidth: containerWidth),
             )));
   }
 }
@@ -746,7 +779,8 @@ class DraftResult extends StatelessWidget {
     }
 
     int cardsPerRow = maxLeaderPicks + maxCommonPicks + maxFollowerPicks + 3;
-    double cardWidth = getEvenlySpacedWidth(context, cardsPerRow);
+    double cardWidth =
+        getEvenlySpacedWidth(context, cardsPerRow, CardSize.small);
     double cardHeight = cardWidth * 1.5;
 
     return Center(
@@ -809,7 +843,7 @@ class DraftResult extends StatelessWidget {
   }
 
   Widget _createAssignmentsHeader(BuildContext context) {
-    double width = getEvenlySpacedWidth(context, 4);
+    double width = getEvenlySpacedWidth(context, 4, CardSize.medium);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
@@ -865,7 +899,7 @@ class MatchWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    double width = getEvenlySpacedWidth(context, cardsPerRow);
+    double width = getEvenlySpacedWidth(context, cardsPerRow, CardSize.large);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [

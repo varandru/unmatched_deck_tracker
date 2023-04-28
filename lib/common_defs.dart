@@ -7,6 +7,21 @@ const Icon twoPlayerIcon = Icon(Icons.people_alt_rounded);
 const Icon helpIcon = Icon(Icons.help);
 const Icon sortIcon = Icon(Icons.sort);
 
+enum CardSize { small, medium, large, doNoClamp }
+
+const double minSmallCardWidth = 0.0;
+const double minMediumCardWidth = 0.0;
+const double minLargeCardWidth = 0.0;
+const double maxSmallCardWidth = 50.0;
+const double maxMediumCardWidth = 200.0;
+const double maxLargeCardWidth = 600.0;
+const double minSmallCardHeight = 20.0 * 1.5;
+const double minMediumCardHeight = 120.0 * 1.5;
+const double minLargeCardHeight = 300.0 * 1.5;
+const double maxSmallCardHeight = 50.0 * 1.5;
+const double maxMediumCardHeight = 200.0 * 1.5;
+const double maxLargeCardHeight = 600.0 * 1.5;
+
 extension StringCasingExtension on String {
   String toCapitalized() =>
       length > 0 ? '${this[0].toUpperCase()}${substring(1).toLowerCase()}' : '';
@@ -14,6 +29,39 @@ extension StringCasingExtension on String {
       .split(' ')
       .map((str) => str.toCapitalized())
       .join(' ');
+}
+
+double getEvenlySpacedWidth(BuildContext context, int cardPerRow, CardSize size,
+    {double spacing = 4.0}) {
+  final screenWidth = MediaQuery.of(context).size.width - spacing;
+  double width = screenWidth / cardPerRow - spacing;
+  switch (size) {
+    case CardSize.small:
+      return width.clamp(minSmallCardWidth, maxSmallCardWidth);
+    case CardSize.medium:
+      return width.clamp(minMediumCardWidth, maxMediumCardWidth);
+    case CardSize.large:
+      return width.clamp(minLargeCardWidth, maxLargeCardWidth);
+    case CardSize.doNoClamp:
+      return width;
+  }
+}
+
+double getEvenlySpacedHeight(
+    BuildContext context, int itemsPerRow, CardSize size,
+    {double spacing = 4.0}) {
+  final screenHeight = MediaQuery.of(context).size.height - spacing;
+  double height = screenHeight / itemsPerRow - spacing;
+  switch (size) {
+    case CardSize.small:
+      return height.clamp(minSmallCardHeight, maxSmallCardHeight);
+    case CardSize.medium:
+      return height.clamp(minMediumCardHeight, maxMediumCardHeight);
+    case CardSize.large:
+      return height.clamp(minLargeCardHeight, maxLargeCardHeight);
+    case CardSize.doNoClamp:
+      return height;
+  }
 }
 
 class TimeOutButton extends StatefulWidget {
