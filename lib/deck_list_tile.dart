@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/common_defs.dart';
 import 'package:unmatched_deck_tracker/deck_choice_widget.dart';
 import 'package:unmatched_deck_tracker/set.dart';
 
@@ -66,7 +67,6 @@ class DeckListTile extends StatelessWidget {
             Text("${deck.move} move", style: style)
           ],
         ),
-        selected: isChosen,
         onTap: () {
           Navigator.of(context).push(
             MaterialPageRoute(
@@ -92,14 +92,17 @@ class DeckListTile extends StatelessWidget {
       ),
     );
 
-    return isChosen
-        ? Card(
-            child: ColorFiltered(
-                colorFilter: const ColorFilter.mode(
-                  Colors.grey,
-                  BlendMode.saturation,
-                ),
-                child: finalNonShadedWidget))
-        : Card(child: finalNonShadedWidget);
+    return Container(
+      constraints: const BoxConstraints(maxWidth: maxWideColumnWidth / 2 - 8.0),
+      child: isChosen
+          ? Card(
+              child: ColorFiltered(
+                  colorFilter: const ColorFilter.mode(
+                    Colors.grey,
+                    BlendMode.saturation,
+                  ),
+                  child: finalNonShadedWidget))
+          : Card(child: finalNonShadedWidget),
+    );
   }
 }

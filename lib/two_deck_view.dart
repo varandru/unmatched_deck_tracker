@@ -102,58 +102,91 @@ class _TwoDecksViewState extends State<TwoDecksView> {
     ];
 
     if (widget.secondDeck != null) {
+      bool isHorizontal = MediaQuery.of(context).size.width >
+          MediaQuery.of(context).size.height;
+      bool twoViewsFit =
+          MediaQuery.of(context).size.width > 2 * (maxNarrowColumnWidth + 8.0);
+
+      bool isWide = isHorizontal && twoViewsFit;
+
       return FutureBuilder(
-        future: Future.wait([
-          deck.fillDeckFromFile(),
-          secondDeck!.fillDeckFromFile(),
-          cardSortType,
-        ]),
-        builder: (context, snapshot) => snapshot.hasData
-            ? WillPopScope(
+          future: Future.wait([
+            deck.fillDeckFromFile(),
+            secondDeck!.fillDeckFromFile(),
+            cardSortType,
+          ]),
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              List<Widget> children = [
+                DeckListView(deck, snapshot.data![2] as CardSortType),
+                DeckListView(secondDeck!, snapshot.data![2] as CardSortType),
+              ];
+
+              return WillPopScope(
                 onWillPop: willPopHelper,
-                child: DefaultTabController(
-                  length: 2,
-                  child: Scaffold(
-                    appBar: AppBar(
-                      title: const Text("Fight!"),
-                      actions: actions,
-                      bottom: TabBar(
-                        tabs: [
-                          Tab(text: deck.summary.name),
-                          Tab(text: secondDeck!.summary.name)
-                        ],
-                        indicatorColor: Colors.grey.shade800,
-                      ),
-                    ),
-                    body: TabBarView(
-                      children: [
-                        DeckListView(deck, snapshot.data![2] as CardSortType),
-                        DeckListView(
-                            secondDeck!, snapshot.data![2] as CardSortType),
-                      ],
-                    ),
-                  ),
-                ),
-              )
-            : const CircularProgressIndicator(),
-      );
+                child: isWide
+                    ? rowScaffold(actions, children)
+                    : tabScaffold(actions, children),
+              );
+            }
+            return const CircularProgressIndicator();
+          });
     } else {
       return FutureBuilder(
         future: Future.wait([deck.fillDeckFromFile(), cardSortType]),
         builder: (context, snapshot) => snapshot.hasData
             ? WillPopScope(
                 onWillPop: willPopHelper,
-                child: Scaffold(
-                  appBar: AppBar(
-                    title: Text(widget.deck.name),
-                    actions: actions,
-                  ),
-                  body: DeckListView(deck,
-                      currentSortType = snapshot.data![1] as CardSortType),
-                ),
+                child: singleDeckView(actions, snapshot),
               )
             : const CircularProgressIndicator(),
       );
     }
+  }
+
+  AdaptiveScaffold singleDeckView(
+      List<Widget> actions, AsyncSnapshot<List<Object>> snapshot) {
+    return AdaptiveScaffold(
+      appBar: AppBar(
+        title: Text(widget.deck.name),
+        actions: actions,
+      ),
+      body: DeckListView(
+          deck, currentSortType = snapshot.data![1] as CardSortType),
+    );
+  }
+
+  DefaultTabController tabScaffold(
+      List<Widget> actions, List<Widget> children) {
+    return DefaultTabController(
+      length: 2,
+      child: AdaptiveScaffold(
+        appBar: AppBar(
+          title: const Text("Fight!"),
+          actions: actions,
+          bottom: TabBar(
+            tabs: [
+              Tab(text: deck.summary.name),
+              Tab(text: secondDeck!.summary.name)
+            ],
+            indicatorColor: Colors.grey.shade800,
+          ),
+        ),
+        body: TabBarView(children: children),
+      ),
+    );
+  }
+
+  AdaptiveScaffold rowScaffold(List<Widget> actions, List<Widget> children) {
+    return AdaptiveScaffold(
+      appBar: AppBar(
+        title: const Text("Fight!"),
+        actions: actions,
+      ),
+      body: Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: children),
+    );
   }
 }

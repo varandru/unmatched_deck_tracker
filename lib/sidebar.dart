@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unmatched_deck_tracker/common_defs.dart';
 import 'package:unmatched_deck_tracker/image_handling.dart';
 
 enum SidebarPosition { deckChoice, arsenal }
@@ -13,8 +14,7 @@ class Sidebar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Drawer(
-        child: ListView(
+    ListView sidebarContent = ListView(
       children: [
         DrawerHeader(
             child: Container(
@@ -42,6 +42,14 @@ class Sidebar extends StatelessWidget {
               }
             }),
       ],
-    ));
+    );
+
+    if (checkMobile(context)) {
+      return Drawer(child: sidebarContent);
+    } else {
+      return Container(
+          constraints: const BoxConstraints(maxWidth: maxDrawerColumnWidth),
+          child: sidebarContent);
+    }
   }
 }

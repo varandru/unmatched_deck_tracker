@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'card_list_tile.dart';
+import 'common_defs.dart';
 import 'deck.dart';
 import 'card.dart' as um;
 
@@ -62,53 +63,58 @@ class _DeckListViewState extends State<DeckListView>
   Widget build(BuildContext context) {
     super.build(context);
     deckInfo.sort(widget.cardSortType);
-    return ListView.builder(
-      itemCount: deckInfo.itemCount,
-      itemBuilder: (context, index) {
-        switch (deckInfo.tileType(index)) {
-          case TileType.handHeader:
-            // TODO Section Header class
-            return ListTile(
-              title: Text(
-                "Revealed cards count = ${deckInfo.hand.count}",
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-            );
-          case TileType.deckHeader:
-            return ListTile(
-              title: Text(
-                "Deck count = ${deckInfo.deck.count}/${deckInfo.totalCardCount}",
-                style: Theme.of(context).textTheme.titleLarge,
-                textAlign: TextAlign.center,
-              ),
-            );
-          case TileType.discardHeader:
-            return Text(
-              "Discard pile has ${deckInfo.discard.count} cards.",
-              style: Theme.of(context).textTheme.titleLarge,
-              textAlign: TextAlign.center,
-            );
-          case TileType.handCard:
-            return CardListTile(deckInfo.handCardByIndex(index),
-                onRightTap: _moveFromHandToDiscard,
-                rightInfo: toDiscardInfo,
-                onLeftTap: _moveFromHandToDeck,
-                leftInfo: toDeckInfo);
-          case TileType.deckCard:
-            return CardListTile(deckInfo.deckCardByIndex(index),
-                onRightTap: _moveFromDeckToDiscard,
-                rightInfo: toDiscardInfo,
-                onLeftTap: _moveFromDeckToHand,
-                leftInfo: toHandInfo);
-          case TileType.discardCard:
-            return CardListTile(deckInfo.discardCardByIndex(index),
-                onRightTap: _moveFromDiscardToDeck,
-                rightInfo: toDeckInfo,
-                onLeftTap: _moveFromDiscardToHand,
-                leftInfo: toHandInfo);
-        }
-      },
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: maxNarrowColumnWidth),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
+        child: ListView.builder(
+          itemCount: deckInfo.itemCount,
+          itemBuilder: (context, index) {
+            switch (deckInfo.tileType(index)) {
+              case TileType.handHeader:
+                return ListTile(
+                  title: Text(
+                    "Revealed cards count = ${deckInfo.hand.count}",
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              case TileType.deckHeader:
+                return ListTile(
+                  title: Text(
+                    "Deck count = ${deckInfo.deck.count}/${deckInfo.totalCardCount}",
+                    style: Theme.of(context).textTheme.titleLarge,
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              case TileType.discardHeader:
+                return Text(
+                  "Discard pile has ${deckInfo.discard.count} cards.",
+                  style: Theme.of(context).textTheme.titleLarge,
+                  textAlign: TextAlign.center,
+                );
+              case TileType.handCard:
+                return CardListTile(deckInfo.handCardByIndex(index),
+                    onRightTap: _moveFromHandToDiscard,
+                    rightInfo: toDiscardInfo,
+                    onLeftTap: _moveFromHandToDeck,
+                    leftInfo: toDeckInfo);
+              case TileType.deckCard:
+                return CardListTile(deckInfo.deckCardByIndex(index),
+                    onRightTap: _moveFromDeckToDiscard,
+                    rightInfo: toDiscardInfo,
+                    onLeftTap: _moveFromDeckToHand,
+                    leftInfo: toHandInfo);
+              case TileType.discardCard:
+                return CardListTile(deckInfo.discardCardByIndex(index),
+                    onRightTap: _moveFromDiscardToDeck,
+                    rightInfo: toDeckInfo,
+                    onLeftTap: _moveFromDiscardToHand,
+                    leftInfo: toHandInfo);
+            }
+          },
+        ),
+      ),
     );
   }
 

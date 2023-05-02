@@ -50,8 +50,8 @@ class PileOfCards {
       _count += parsedCard.count;
     }
   }
-  // ignore: prefer_final_fields
-  List<Card> _cards = [];
+
+  final List<Card> _cards = [];
   // Count of all the cards in the deck. Should be 30 for most characters
   int _count = 0;
 

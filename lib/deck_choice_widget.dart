@@ -106,7 +106,7 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
     bool isChoosingFirstDeck = widget.chosenDeck == null;
 
     if (isChoosingFirstDeck) {
-      return Scaffold(
+      return AdaptiveScaffold(
         appBar: AppBar(
           title: Text(widget.title),
           actions: [
@@ -151,7 +151,7 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
         ),
       );
     } else {
-      return Scaffold(
+      return AdaptiveScaffold(
         appBar: AppBar(
           title: Text(widget.title),
         ),
@@ -159,6 +159,8 @@ class _DeckChoiceWidgetState extends State<DeckChoiceWidget> {
           widget.chosenDeck!.sets,
           widget.chosenDeck!.previousChoice,
         ),
+        drawer: const Sidebar(SidebarPosition.deckChoice,
+            openDeckChoice: goToDeckChoice, openArsenal: goToArsenal),
       );
     }
   }

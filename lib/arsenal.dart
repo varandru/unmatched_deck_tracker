@@ -13,9 +13,19 @@ enum CurrentArsenalState {
 }
 
 class RoundPick {
-  Set<String> leaderPicks = Set.identity();
-  Set<String> commonPicks = Set.identity();
-  Set<String> followerPicks = Set.identity();
+  RoundPick()
+      : leaderPicks = Set.identity(),
+        commonPicks = Set.identity(),
+        followerPicks = Set.identity();
+
+  RoundPick.fromSets(
+      {required this.leaderPicks,
+      required this.commonPicks,
+      required this.followerPicks});
+
+  Set<String> leaderPicks;
+  Set<String> commonPicks;
+  Set<String> followerPicks;
 }
 
 class ArsenalDraft {
