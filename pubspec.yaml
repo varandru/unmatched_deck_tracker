@@ -39,6 +39,7 @@ dependencies:
   flutter_svg: ^1.1.5
   shared_preferences: ^2.0.15
   url_launcher: ^6.1.10
+  asset_cache: ^2.0.0
 
 dev_dependencies:
   flutter_test:
