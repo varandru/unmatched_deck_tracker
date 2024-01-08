@@ -150,8 +150,7 @@ class _TimeOutButtonState extends State<TimeOutButton> {
 
 class ExpandCollapseButton extends StatefulWidget {
   const ExpandCollapseButton(
-      {Key? key, required this.expandAll, required this.collapseAll})
-      : super(key: key);
+      {super.key, required this.expandAll, required this.collapseAll});
 
   final VoidCallback expandAll;
   final VoidCallback collapseAll;

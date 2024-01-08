@@ -526,11 +526,11 @@ class ArsenalAssignmentsBody extends StatelessWidget {
 
 class AssignmentTarget extends StatelessWidget {
   const AssignmentTarget({
-    Key? key,
+    super.key,
     required this.color,
     required this.onAccept,
     this.selectedHero,
-  }) : super(key: key);
+  });
 
   final Color color;
   final void Function(String) onAccept;
@@ -787,7 +787,8 @@ class ArsenalHistoryView extends StatelessWidget {
       child: DataTable(
         horizontalMargin: 4.0,
         columnSpacing: 0.0,
-        dataRowHeight: cardHeight + 4.0,
+        dataRowMinHeight: cardHeight + 4.0,
+        dataRowMaxHeight: cardHeight + 4.0,
         border: TableBorder.symmetric(inside: const BorderSide()),
         columns: const [
           DataColumn(label: Expanded(child: Center(child: Text("Leader")))),

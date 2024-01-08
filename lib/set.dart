@@ -37,7 +37,7 @@ class ReleaseSet {
     for (var characterName in characterNames) {
       int index = decks.indexWhere((element) => element.name == characterName);
       if (index == -1) {
-        print("Deck $characterName not found!");
+        // print("Deck $characterName not found!");
         return false;
       } else {
         characters.add(decks[index]);

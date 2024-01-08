@@ -1,5 +1,6 @@
 import 'package:unmatched_deck_tracker/deck.dart';
 
+// ignore: constant_identifier_names
 const int ARSENAL_SIZE = 4;
 
 enum CurrentArsenalState {
@@ -144,13 +145,13 @@ class ArsenalDraft {
 
   bool _confirmSelectionLeader() {
     if (currentPicks.length + leaderChoice.length != ARSENAL_SIZE) {
-      print("Select the neccessary fighters");
+      // print("Select the neccessary fighters");
       return false;
     }
 
     if (currentPicks.intersection(leaderChoice).isNotEmpty) {
-      print("How the fuck? Combined fighters are"
-          " ${currentPicks.intersection(leaderChoice).toString()}");
+      // print("How the fuck? Combined fighters are"
+      //     " ${currentPicks.intersection(leaderChoice).toString()}");
     }
 
     _movePoolToLeader();
@@ -162,13 +163,10 @@ class ArsenalDraft {
 
   bool _confirmSelectionFollower() {
     if (currentPicks.length + followerChoice.length != ARSENAL_SIZE) {
-      print("Select the neccessary fighters");
       return false;
     }
 
     if (currentPicks.intersection(followerChoice).isNotEmpty) {
-      print("How the fuck? Combined fighters are"
-          " ${currentPicks.intersection(followerChoice).toString()}");
       return false;
     }
 
@@ -179,27 +177,20 @@ class ArsenalDraft {
 
   bool _checkSelectionLeader() {
     if (currentPicks.length + leaderChoice.length != ARSENAL_SIZE) {
-      print("Select the neccessary fighters");
       return false;
     }
 
-    if (currentPicks.intersection(leaderChoice).isNotEmpty) {
-      print("How the fuck? Combined fighters are"
-          " ${currentPicks.intersection(leaderChoice).toString()}");
-    }
+    if (currentPicks.intersection(leaderChoice).isNotEmpty) {}
 
     return true;
   }
 
   bool _checkSelectionFollower() {
     if (currentPicks.length + followerChoice.length != ARSENAL_SIZE) {
-      print("Select the neccessary fighters");
       return false;
     }
 
     if (currentPicks.intersection(followerChoice).isNotEmpty) {
-      print("How the fuck? Combined fighters are"
-          " ${currentPicks.intersection(followerChoice).toString()}");
       return false;
     }
 
@@ -278,14 +269,12 @@ class PositionPick {
       followerPick.isEmpty ? true : followerPick == fighter;
 
   void removeLeaderFighter(String fighter) {
-    print("Removing character '$fighter'. Current pick is $leaderPick");
     if (leaderPick == fighter) {
       leaderPick = "";
     }
   }
 
   void removeFollowerFighter(String fighter) {
-    print("Removing character '$fighter'. Current pick is '$followerPick'");
     if (followerPick == fighter) {
       followerPick = "";
     }
@@ -318,8 +307,6 @@ class ArsenalAssignments {
     leaderFighters = leaderPicks;
     followerFighters = followerPicks;
     this.hasNeutralGame = hasNeutralGame;
-    print('Leader has $leaderFighters');
-    print('Follower has $followerFighters');
   }
 
   void assignMyAdvantage(String fighter) {

@@ -5,7 +5,7 @@ import 'image_handling.dart';
 
 class HeroView extends StatelessWidget {
   const HeroView({
-    Key? key,
+    super.key,
     required this.heroes,
     this.currentPicks,
     this.clickedCharacter,
@@ -14,7 +14,7 @@ class HeroView extends StatelessWidget {
     this.spacing = 4.0,
     required this.cardType,
     this.cardSize = CardSize.medium,
-  }) : super(key: key);
+  });
 
   final List<String> heroes;
   final Set<String>? currentPicks;
